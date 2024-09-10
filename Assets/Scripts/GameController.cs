@@ -137,6 +137,7 @@ public class GameController : MonoBehaviour
     // 配列情報を確認する（デバッグ用）
     public void DebugArray()
     {
+        Debug.Log("Start Debugging the Array");
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)

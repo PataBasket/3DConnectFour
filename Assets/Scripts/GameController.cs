@@ -45,7 +45,6 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         // マウスがクリックされたとき
         if (Input.GetMouseButtonUp(0))
         {
@@ -65,8 +64,11 @@ public class GameController : MonoBehaviour
                     {
                         if (grid[gridIndex.x, y, gridIndex.y] == EMPTY)
                         {
+                            // ポールの位置を取得
+                            Vector3 polePosition = clickedPole.transform.position;
+
                             // キューブを配置
-                            PlaceCube(gridIndex.x, y, gridIndex.y);
+                            PlaceCube(polePosition, clickedPole, gridIndex.x, y, gridIndex.y);
                             break;
                         }
                     }
@@ -76,7 +78,7 @@ public class GameController : MonoBehaviour
     }
 
     // キューブを配置する
-    private void PlaceCube(int x, int y, int z)
+    private void PlaceCube(Vector3 polePosition, GameObject clickedPole, int x, int y, int z)
     {
         GameObject cube;
 
@@ -101,8 +103,11 @@ public class GameController : MonoBehaviour
             currentPlayer = WHITE;
         }
 
-        // キューブをポールの上に設置
-        cube.transform.position = new Vector3(x, y, z);
+        // キューブをポールの上に追従させる
+        cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
+
+        // キューブをポールの子オブジェクトに設定
+        cube.transform.SetParent(clickedPole.transform);
     }
 
     // 配列情報を初期化する

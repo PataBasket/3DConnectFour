@@ -45,8 +45,9 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         // マウスがクリックされたとき
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
         {
             // マウスのポジションを取得してRayに代入
             Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
@@ -123,7 +124,6 @@ public class GameController : MonoBehaviour
     private void InitializePoleMapping()
     {
         // ここでポールオブジェクトを手動で設定し、座標をマッピング
-        // 例: "Pole_0_0" が x = 0, z = 0 の位置のポールを表す
         for (int x = 0; x < 4; x++)
         {
             for (int z = 0; z < 4; z++)

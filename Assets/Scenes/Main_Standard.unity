@@ -821,8 +821,9 @@ GameObject:
   m_Component:
   - component: {fileID: 727240137}
   - component: {fileID: 727240138}
+  - component: {fileID: 727240139}
   m_Layer: 0
-  m_Name: GameController
+  m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -857,6 +858,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
+--- !u!114 &727240139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727240136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b3051dbcd4ba2f4fadbcf0d3a5619bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseObject: {fileID: 814430990}
 --- !u!1 &739866029
 GameObject:
   m_ObjectHideFlags: 0

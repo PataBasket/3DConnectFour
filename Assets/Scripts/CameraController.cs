@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         // マウスのドラッグ操作の入力を取得
-        if (Input.GetMouseButton(1)) // 左クリックを押しているとき
+        if (Input.GetMouseButton(1)) // 右クリックを押しているとき
         {
             float mouseY = Input.GetAxis("Mouse Y");  // マウスのY軸の動き
 

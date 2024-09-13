@@ -17,11 +17,11 @@ public class InputHandler
 
     public void Update()
     {
-        RotateCamera();
+        ClickPole();
         RotateBase();
     }
 
-    private void RotateCamera()
+    private void ClickPole()
     {
         if (Input.GetMouseButtonUp(0))
         {

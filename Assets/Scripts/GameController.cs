@@ -29,46 +29,44 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // カメラ情報を取得
         camera_object = GameObject.Find("Main Camera").GetComponent<Camera>();
-
-        // 配列を初期化
         InitializeArray();
-
-        // ポールオブジェクトをグリッドにマッピング
         InitializePoleMapping();
-
-        // デバッグ用メソッド
-        DebugArray();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // マウスがクリックされたとき
         if (Input.GetMouseButtonUp(0))
         {
-            // マウスのポジションを取得してRayに代入
             Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
 
-            // マウスのポジションからRayを投げて何かに当たったらhitに入れる
             if (Physics.Raycast(ray, out hit))
             {
                 GameObject clickedPole = hit.collider.gameObject;
 
-                // クリックされたオブジェクトがポールか確認し、グリッド座標を取得
                 if (poleToGridMap.TryGetValue(clickedPole, out Vector2Int gridIndex))
                 {
-                    // 最初の空のy値を探す
                     for (int y = 0; y < 4; y++)
                     {
                         if (grid[gridIndex.x, y, gridIndex.y] == EMPTY)
                         {
-                            // ポールの位置を取得
                             Vector3 polePosition = clickedPole.transform.position;
-
-                            // キューブを配置
                             PlaceCube(polePosition, clickedPole, gridIndex.x, y, gridIndex.y);
+
+                            // 勝敗判定を追加
+                            if (CheckWinCondition(gridIndex.x, y, gridIndex.y))
+                            {
+                                if (currentPlayer == BLACK)
+                                {
+                                    Debug.Log("白の勝ち");
+                                }
+                                else
+                                {
+                                    Debug.Log("黒の勝ち");
+                                }
+                            }
+
                             break;
                         }
                     }
@@ -77,40 +75,27 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // キューブを配置する
     private void PlaceCube(Vector3 polePosition, GameObject clickedPole, int x, int y, int z)
     {
         GameObject cube;
 
-        // 白のターンのとき
         if (currentPlayer == WHITE)
         {
-            // キューブの値を更新
             grid[x, y, z] = WHITE;
-
-            // 白のキューブを生成
             cube = Instantiate(whiteCube);
             currentPlayer = BLACK;
         }
-        // 黒のターンのとき
         else
         {
-            // キューブの値を更新
             grid[x, y, z] = BLACK;
-
-            // 黒のキューブを生成
             cube = Instantiate(blackCube);
             currentPlayer = WHITE;
         }
 
-        // キューブをポールの上に追従させる
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
-
-        // キューブをポールの子オブジェクトに設定
         cube.transform.SetParent(clickedPole.transform);
     }
 
-    // 配列情報を初期化する
     private void InitializeArray()
     {
         for (int x = 0; x < 4; x++)
@@ -125,10 +110,8 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // ポールオブジェクトをグリッドにマッピングする
     private void InitializePoleMapping()
     {
-        // ここでポールオブジェクトを手動で設定し、座標をマッピング
         for (int x = 0; x < 4; x++)
         {
             for (int z = 0; z < 4; z++)
@@ -139,19 +122,50 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // 配列情報を確認する（デバッグ用）
-    public void DebugArray()
+    // 勝敗判定のメソッド
+    private bool CheckWinCondition(int x, int y, int z)
     {
-        Debug.Log("Start Debugging the Array");
-        for (int x = 0; x < 4; x++)
+        int player = grid[x, y, z]; // プレイヤーの値を取得
+
+        // 各方向の勝利条件をチェック（逆方向の斜めも含めて）
+        return CheckLine(x, y, z, 1, 0, 0, player) || // x方向
+               CheckLine(x, y, z, 0, 1, 0, player) || // y方向
+               CheckLine(x, y, z, 0, 0, 1, player) || // z方向
+               CheckLine(x, y, z, 1, 1, 0, player) || // xy斜め
+               CheckLine(x, y, z, 1, 0, 1, player) || // xz斜め
+               CheckLine(x, y, z, 0, 1, 1, player) || // yz斜め
+               CheckLine(x, y, z, -1, 1, 0, player) || // xy逆斜め
+               CheckLine(x, y, z, -1, 0, 1, player) || // xz逆斜め
+               CheckLine(x, y, z, 0, -1, 1, player) || // yz逆斜め
+               CheckLine(x, y, z, 1, 1, 1, player) || // xyz斜め
+               CheckLine(x, y, z, -1, 1, 1, player) || // xyz逆斜め
+               CheckLine(x, y, z, 1, 1, -1, player) || // xyz逆斜め
+               CheckLine(x, y, z, 1, -1, -1, player);  // xyz逆方向の逆斜め
+    }
+
+
+    // 指定した方向に連続したキューブが4つ揃っているかをチェック
+    private bool CheckLine(int x, int y, int z, int dx, int dy, int dz, int player)
+    {
+        int count = 0;
+
+        for (int i = -3; i <= 3; i++)
         {
-            for (int y = 0; y < 4; y++)
+            int nx = x + i * dx;
+            int ny = y + i * dy;
+            int nz = z + i * dz;
+
+            if (nx >= 0 && nx < 4 && ny >= 0 && ny < 4 && nz >= 0 && nz < 4 && grid[nx, ny, nz] == player)
             {
-                for (int z = 0; z < 4; z++)
-                {
-                    Debug.Log("(x, y, z) = (" + x + "," + y + "," + z + ") = " + grid[x, y, z]);
-                }
+                count++;
+                if (count == 4) return true;
+            }
+            else
+            {
+                count = 0;
             }
         }
+
+        return false;
     }
 }

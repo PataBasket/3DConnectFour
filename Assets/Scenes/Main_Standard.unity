@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 65130071}
   m_Layer: 0
   m_Name: pole_3_0
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 183809132}
   m_Layer: 0
   m_Name: pole_3_3
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -453,7 +453,7 @@ GameObject:
   - component: {fileID: 233083200}
   m_Layer: 0
   m_Name: pole_3_1
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -838,7 +838,6 @@ GameObject:
   m_Component:
   - component: {fileID: 727240137}
   - component: {fileID: 727240138}
-  - component: {fileID: 727240139}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -875,21 +874,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
---- !u!114 &727240139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727240136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b3051dbcd4ba2f4fadbcf0d3a5619bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseObject: {fileID: 814430990}
-  minVerticalAngle: 0
-  maxVerticalAngle: 30
 --- !u!1 &739866029
 GameObject:
   m_ObjectHideFlags: 0
@@ -904,7 +888,7 @@ GameObject:
   - component: {fileID: 739866030}
   m_Layer: 0
   m_Name: pole_2_3
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1192,7 +1176,7 @@ GameObject:
   - component: {fileID: 895948584}
   m_Layer: 0
   m_Name: pole_1_1
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1299,7 +1283,7 @@ GameObject:
   - component: {fileID: 932425223}
   m_Layer: 0
   m_Name: pole_1_2
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1406,7 +1390,7 @@ GameObject:
   - component: {fileID: 1014488242}
   m_Layer: 0
   m_Name: pole_1_3
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1513,7 +1497,7 @@ GameObject:
   - component: {fileID: 1136795356}
   m_Layer: 0
   m_Name: pole_3_2
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1620,7 +1604,7 @@ GameObject:
   - component: {fileID: 1296564281}
   m_Layer: 0
   m_Name: pole_1_0
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1727,7 +1711,7 @@ GameObject:
   - component: {fileID: 1339613045}
   m_Layer: 0
   m_Name: pole_0_3
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1834,7 +1818,7 @@ GameObject:
   - component: {fileID: 1446680987}
   m_Layer: 0
   m_Name: pole_2_1
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1941,7 +1925,7 @@ GameObject:
   - component: {fileID: 1537502838}
   m_Layer: 0
   m_Name: pole_2_0
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2153,7 +2137,7 @@ GameObject:
   - component: {fileID: 1703330398}
   m_Layer: 0
   m_Name: pole_0_0
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2260,7 +2244,7 @@ GameObject:
   - component: {fileID: 1704049432}
   m_Layer: 0
   m_Name: pole_0_2
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2367,7 +2351,7 @@ GameObject:
   - component: {fileID: 1749173934}
   m_Layer: 0
   m_Name: pole_0_1
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2542,7 +2526,7 @@ GameObject:
   - component: {fileID: 2147390004}
   m_Layer: 0
   m_Name: pole_2_2
-  m_TagString: Untagged
+  m_TagString: Pole
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

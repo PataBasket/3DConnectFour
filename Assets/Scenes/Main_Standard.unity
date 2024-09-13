@@ -874,6 +874,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
+  isCPUEnabled: 1
 --- !u!1 &739866029
 GameObject:
   m_ObjectHideFlags: 0
@@ -1047,7 +1048,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &819976416
 RectTransform:
   m_ObjectHideFlags: 0

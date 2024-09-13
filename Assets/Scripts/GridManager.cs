@@ -4,7 +4,7 @@ using UnityEngine;
 public class GridManager
 {
     private const int EMPTY = 0;
-    private const int SIZE = 4;
+    public const int SIZE = 4;
 
     // シングルトンのインスタンス
     public static GridManager Instance { get; private set; }

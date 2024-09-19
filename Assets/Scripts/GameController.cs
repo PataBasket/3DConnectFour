@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -16,13 +15,14 @@ public class GameController : MonoBehaviour
     public GameObject whiteCube;
     public GameObject blackCube;
     public bool isCPUEnabled = false; // インスペクタで設定する
+    public CubeAgent cpuAgent; // エージェントのインスタンス
 
     private const float cpuMoveDelay = 1.0f; // CPUの移動にかかる時間
 
     // Start is called before the first frame update
     void Start()
     {
-        gridManager = new GridManager();
+        gridManager = FindObjectOfType<GridManager>();
         inputHandler = new InputHandler();
         winChecker = new WinChecker();
 
@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour
         {
             Vector3 polePosition = clickedPole.transform.position;
             GameObject cube = currentPlayer == WHITE ? whiteCube : blackCube;
-            gridManager.PlaceCube(polePosition, clickedPole, gridIndex.x, height, gridIndex.y, currentPlayer, cube);
+            gridManager.PlaceCube(polePosition, gridIndex.x, height, gridIndex.y, currentPlayer, cube);
 
             if (winChecker.CheckWinCondition(gridManager.Grid, gridIndex.x, height, gridIndex.y, currentPlayer))
             {
@@ -65,39 +65,30 @@ public class GameController : MonoBehaviour
 
             if (isCPUEnabled && currentPlayer == BLACK)
             {
-                await PerformCPUMove();
+                await ProcessAgentMove();
                 currentPlayer = WHITE; // プレイヤーに戻す
             }
         }
     }
 
-    private async UniTask PerformCPUMove()
+    private async UniTask ProcessAgentMove()
     {
         await UniTask.Delay((int)(cpuMoveDelay * 1000)); // CPUの移動まで待機
 
-        List<Vector2Int> availablePositions = new List<Vector2Int>();
-        for (int x = 0; x < GridManager.SIZE; x++)
-        {
-            for (int z = 0; z < GridManager.SIZE; z++)
-            {
-                if (gridManager.GetAvailableHeight(x, z) != -1)
-                {
-                    availablePositions.Add(new Vector2Int(x, z));
-                }
-            }
-        }
+        // エージェントのアクションを取得
+        var action = cpuAgent.GetNextMove();
+        int x = action.x;
+        int z = action.z;
 
-        if (availablePositions.Count > 0)
+        int height = gridManager.GetAvailableHeight(x, z);
+        if (height != -1)
         {
-            Vector2Int randomPosition = availablePositions[Random.Range(0, availablePositions.Count)];
-            GameObject randomPole = GameObject.Find("pole_" + randomPosition.x + "_" + randomPosition.y);
-            int height = gridManager.GetAvailableHeight(randomPosition.x, randomPosition.y);
-            Vector3 polePosition = randomPole.transform.position;
+            Vector3 polePosition = gridManager.GetPolePosition(x, z);
             GameObject cube = blackCube; // CPUは黒いキューブを置く
 
-            gridManager.PlaceCube(polePosition, randomPole, randomPosition.x, height, randomPosition.y, BLACK, cube);
+            gridManager.PlaceCube(polePosition, x, height, z, BLACK, cube);
 
-            if (winChecker.CheckWinCondition(gridManager.Grid, randomPosition.x, height, randomPosition.y, BLACK))
+            if (winChecker.CheckWinCondition(gridManager.Grid, x, height, z, BLACK))
             {
                 Debug.Log("黒の勝ち (CPU)");
             }

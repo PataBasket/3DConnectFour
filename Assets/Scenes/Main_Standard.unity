@@ -875,10 +875,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b61b9aa0f2edf5a49968a99c45b82285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentPlayer: 1
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
   isCPUEnabled: 1
-  cpuAgent: {fileID: 727240139}
+  isTraining: 0
+  cpuAgent1: {fileID: 989570782}
+  cpuAgent2: {fileID: 0}
 --- !u!114 &727240139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -897,6 +900,7 @@ MonoBehaviour:
   MaxStep: 0
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
+  playerID: 0
 --- !u!114 &727240140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -922,7 +926,7 @@ MonoBehaviour:
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: My Behavior
+  m_BehaviorName: ConnectFour
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -1442,6 +1446,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 814430991}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &989570780
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 989570781}
+  - component: {fileID: 989570783}
+  - component: {fileID: 989570782}
+  m_Layer: 0
+  m_Name: CPUManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &989570781
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989570780}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &989570782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989570780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcbcfb5bdfddc8a40b720852b533a416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
+  blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
+  playerID: 0
+--- !u!114 &989570783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989570780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 65
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 0400000004000000
+    VectorActionSize: 0400000004000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 5022602860645237092, guid: 9f127e05f8bfa7945af4b2e079346d34, type: 3}
+  m_InferenceDevice: 0
+  m_BehaviorType: 2
+  m_BehaviorName: My Behavior
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_DeterministicInference: 0
+  m_ObservableAttributeHandling: 0
 --- !u!1 &1014488241
 GameObject:
   m_ObjectHideFlags: 0
@@ -2695,3 +2782,4 @@ SceneRoots:
   - {fileID: 165110554}
   - {fileID: 727240137}
   - {fileID: 2045161636}
+  - {fileID: 989570781}

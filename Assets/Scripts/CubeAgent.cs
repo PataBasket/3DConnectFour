@@ -6,80 +6,66 @@ using UnityEngine;
 public class CubeAgent : Agent
 {
     private GridManager gridManager;
-    private int playerID; // 白か黒のプレイヤーを判別
     private WinChecker winChecker;
 
-    public GameObject whiteCube; // インスペクタで設定
-    public GameObject blackCube; // インスペクタで設定
+    public GameObject whiteCube;
+    public GameObject blackCube;
+    public int playerID; // Player ID (1 or -1)
+
+    // エージェントの行動をGameControllerに渡すためのプロパティ
+    public bool HasAction { get; set; } = false;
+    public int SelectedActionX { get; set; }
+    public int SelectedActionZ { get; set; }
 
     public override void Initialize()
     {
         gridManager = FindObjectOfType<GridManager>();
         winChecker = new WinChecker();
-        playerID = 1; // 白で初期化
     }
 
     public override void OnEpisodeBegin()
     {
-        // グリッドとシーンのリセット
-        gridManager.InitializeArray();
+        // エージェント側では環境のリセットを行わない
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // グリッド状態を観測データとして収集（例えば、空の位置や配置されたキューブ）
+        // グリッド全体の状態を観測 (-1: 相手, 0: 空, 1: 自分)
         for (int x = 0; x < GridManager.SIZE; x++)
         {
-            for (int z = 0; z < GridManager.SIZE; z++)
+            for (int y = 0; y < GridManager.HEIGHT; y++)
             {
-                sensor.AddObservation(gridManager.GetAvailableHeight(x, z));
+                for (int z = 0; z < GridManager.SIZE; z++)
+                {
+                    int cellValue = gridManager.Grid[x, y, z];
+                    // 自分から見た相対的な値に変換
+                    if (cellValue == playerID)
+                        sensor.AddObservation(1);
+                    else if (cellValue == 0)
+                        sensor.AddObservation(0);
+                    else
+                        sensor.AddObservation(-1);
+                }
             }
         }
+
+        // 現在のプレイヤーのターンかどうか
+        sensor.AddObservation((GameController.Instance.currentPlayer == playerID) ? 1 : 0);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        // 受け取ったアクションを基に、エージェントがキューブを配置
-        int x = actions.DiscreteActions[0]; // x軸の選択
-        int z = actions.DiscreteActions[1]; // z軸の選択
-
-        int y = gridManager.GetAvailableHeight(x, z);
-        if (y != -1)
-        {
-            Vector3 polePosition = gridManager.GetPolePosition(x, z);
-            GameObject cube = playerID == 1 ? whiteCube : blackCube;
-            gridManager.PlaceCube(polePosition, x, y, z, playerID, cube);
-
-            if (winChecker.CheckWinCondition(gridManager.Grid, x, y, z, playerID))
-            {
-                SetReward(1.0f); // 勝利の報酬
-                EndEpisode();
-            }
-            else if (gridManager.IsFull()) // 引き分け
-            {
-                SetReward(0.0f);
-                EndEpisode();
-            }
-        }
-        else
-        {
-            SetReward(-0.1f); // 無効な動き
-        }
+        // 行動をGameControllerに渡す
+        SelectedActionX = actions.DiscreteActions[0];
+        SelectedActionZ = actions.DiscreteActions[1];
+        HasAction = true; // 行動が決定されたことを通知
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        // 人間のプレイヤー用の操作（手動操作用、ここではランダムな動作を設定）
+        // ランダムな行動を選択
         var discreteActions = actionsOut.DiscreteActions;
-        discreteActions[0] = Random.Range(0, GridManager.SIZE); // x軸のランダムな選択
-        discreteActions[1] = Random.Range(0, GridManager.SIZE); // z軸のランダムな選択
-    }
-
-    // GetNextMove メソッドを追加
-    public (int x, int z) GetNextMove()
-    {
-        // ここでエージェントが選んだアクションを返す
-        // 例としてランダムな動きを返す（実際にはモデルの出力に基づく）
-        return (Random.Range(0, GridManager.SIZE), Random.Range(0, GridManager.SIZE));
+        discreteActions[0] = Random.Range(0, GridManager.SIZE);
+        discreteActions[1] = Random.Range(0, GridManager.SIZE);
     }
 }

@@ -1,35 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager
+public class GridManager : MonoBehaviour
 {
     private const int EMPTY = 0;
     public const int SIZE = 4;
+    public const int HEIGHT = 4; // 高さの定義を追加
 
-    // シングルトンのインスタンス
     public static GridManager Instance { get; private set; }
 
-    public int[,,] Grid { get; private set; } = new int[SIZE, SIZE, SIZE];
+    // グリッドの状態を保持する3次元配列
+    public int[,,] Grid { get; private set; } = new int[SIZE, HEIGHT, SIZE];
     private Dictionary<GameObject, Vector2Int> poleToGridMap = new Dictionary<GameObject, Vector2Int>();
 
-    public GridManager()
+    void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            // DontDestroyOnLoad(gameObject); // シーンが切り替わらない場合は不要
         }
         else
         {
-            Debug.LogError("Multiple instances of GridManager detected!");
+            Destroy(gameObject);
         }
     }
 
-    // グリッドを初期化
+    // グリッドの初期化
     public void InitializeArray()
     {
         for (int x = 0; x < SIZE; x++)
         {
-            for (int y = 0; y < SIZE; y++)
+            for (int y = 0; y < HEIGHT; y++)
             {
                 for (int z = 0; z < SIZE; z++)
                 {
@@ -39,7 +41,7 @@ public class GridManager
         }
     }
 
-    // ポールオブジェクトとグリッドインデックスを紐づけ
+    // ポールとグリッド座標のマッピングを初期化
     public void InitializePoleMapping()
     {
         for (int x = 0; x < SIZE; x++)
@@ -47,36 +49,62 @@ public class GridManager
             for (int z = 0; z < SIZE; z++)
             {
                 GameObject pole = GameObject.Find("pole_" + x + "_" + z);
-                poleToGridMap[pole] = new Vector2Int(x, z);
+                if (pole != null)
+                {
+                    poleToGridMap[pole] = new Vector2Int(x, z);
+                }
             }
         }
     }
 
-    // 空のグリッドの高さを取得
+    // 指定した位置の利用可能な高さを取得
     public int GetAvailableHeight(int x, int z)
     {
-        for (int y = 0; y < SIZE; y++)
+        for (int y = 0; y < HEIGHT; y++)
         {
             if (Grid[x, y, z] == EMPTY)
             {
                 return y;
             }
         }
-        return -1; // グリッドが満杯の場合
+        return -1; // 高さが利用できない場合
     }
 
-    // キューブをグリッドとシーンに配置
-    public void PlaceCube(Vector3 polePosition, GameObject clickedPole, int x, int y, int z, int player, GameObject cubePrefab)
+    // キューブを配置
+    public void PlaceCube(Vector3 polePosition, int x, int y, int z, int player, GameObject cubePrefab)
     {
         Grid[x, y, z] = player;
-        GameObject cube = Object.Instantiate(cubePrefab);
+        GameObject cube = Instantiate(cubePrefab);
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
-        cube.transform.SetParent(clickedPole.transform);
+        cube.transform.SetParent(GameObject.Find("pole_" + x + "_" + z).transform);
     }
 
-    // ポールに対応するグリッドインデックスを取得
+    // ポールからグリッドインデックスを取得
     public Vector2Int GetGridIndex(GameObject pole)
     {
         return poleToGridMap[pole];
+    }
+
+    // グリッド座標からポールの位置を取得
+    public Vector3 GetPolePosition(int x, int z)
+    {
+        GameObject pole = GameObject.Find("pole_" + x + "_" + z);
+        return pole.transform.position;
+    }
+
+    // グリッドが満杯かどうかを確認
+    public bool IsFull()
+    {
+        for (int x = 0; x < SIZE; x++)
+        {
+            for (int z = 0; z < SIZE; z++)
+            {
+                if (GetAvailableHeight(x, z) != -1)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

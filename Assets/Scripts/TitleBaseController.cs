@@ -62,7 +62,7 @@ public class TitleBaseController : MonoBehaviour
         isAnimating = true; // アニメーション中の状態に更新
     }
 
-    private void StopAnimation()
+    public void StopAnimation()
     {
         // 上下運動と回転運動を停止
         moveTween.Kill();

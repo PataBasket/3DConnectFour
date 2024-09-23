@@ -3,6 +3,7 @@ using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies; // この行を追加
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CubeAgent : Agent
 {
@@ -68,7 +69,14 @@ public class CubeAgent : Agent
         AddGridObservations(sensor, transformedGrid);
 
         // 現在のプレイヤーのターンかどうか
-        sensor.AddObservation((TrainingController.Instance.currentPlayer == playerID) ? 1 : 0);
+        if (SceneManager.GetActiveScene().name == "Main_Standard")
+        {
+            sensor.AddObservation((GameController.Instance.currentPlayer == playerID) ? 1 : 0);
+        }
+        else if (SceneManager.GetActiveScene().name == "TrainingScene_1")
+        {
+            sensor.AddObservation((TrainingController.Instance.currentPlayer == playerID) ? 1 : 0);
+        }
     }
 
     private void AddGridObservations(VectorSensor sensor, int[,,] grid)

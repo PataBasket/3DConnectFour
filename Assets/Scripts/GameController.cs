@@ -14,8 +14,6 @@ public class GameController : MonoBehaviour
 
     public GameObject whiteCube;
     public GameObject blackCube;
-    public bool isCPUEnabled = true; // CPUエージェントを有効化
-    public bool isTraining = false; // トレーニングモードを無効化
     public CubeAgent cpuAgent; // エージェント（BLACK）
 
     private bool gameEnded = false; // ゲーム終了フラグ
@@ -27,7 +25,7 @@ public class GameController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // DontDestroyOnLoad(gameObject);
+            // シーンが切り替わらない場合は不要
         }
         else
         {
@@ -83,10 +81,7 @@ public class GameController : MonoBehaviour
 
             currentPlayer = BLACK;
 
-            if (isCPUEnabled && currentPlayer == BLACK)
-            {
-                await ProcessAgentMove(cpuAgent);
-            }
+            await ProcessAgentMove(cpuAgent);
         }
     }
 

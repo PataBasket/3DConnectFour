@@ -117,26 +117,30 @@ public class WinChecker
         return false;
     }
     
-    // 指定したプレイヤーがリーチを持っているか確認
-    public bool HasPlayerReach(int[,,] grid, int player)
+    // 相手のリーチ（3つ並べた状態）を検出してその位置を返す
+    public (int, int) FindOpponentReach(int[,,] grid, int opponentPlayerID)
     {
         for (int x = 0; x < GridManager.SIZE; x++)
         {
-            for (int y = 0; y < GridManager.HEIGHT; y++)
+            for (int z = 0; z < GridManager.SIZE; z++)
             {
-                for (int z = 0; z < GridManager.SIZE; z++)
+                int height = GridManager.Instance.GetAvailableHeight(x, z);
+                if (height != -1)
                 {
-                    if (grid[x, y, z] == player)
+                    // 仮にこの場所に相手が置いた場合リーチが完成するかどうか
+                    grid[x, height, z] = opponentPlayerID; // 仮に置く
+                    bool isReach = CheckReachCondition(grid, x, height, z, opponentPlayerID);
+                    grid[x, height, z] = 0; // 元に戻す
+
+                    if (isReach)
                     {
-                        if (CheckReachCondition(grid, x, y, z, player))
-                        {
-                            return true;
-                        }
+                        // リーチが完成する場所が見つかったので、その位置を返す
+                        return (x, z);
                     }
                 }
             }
         }
-        return false;
+        return (-1, -1); // リーチがない場合
     }
 
 }

@@ -102,106 +102,89 @@ public class TrainingController : MonoBehaviour
     }
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
+{
+    // リーチをチェック
+    int opponentPlayerID = (agent.playerID == WHITE) ? BLACK : WHITE;
+    (int reachX, int reachZ) = winChecker.FindOpponentReach(gridManager.Grid, opponentPlayerID);
+
+    // 相手がリーチしている場合、その位置をブロックする
+    if (reachX != -1 && reachZ != -1)
     {
+        // 相手がリーチしているので防ぐ
+        agent.SelectedActionX = reachX;
+        agent.SelectedActionZ = reachZ;
+        agent.HasAction = true;
+    }
+    else
+    {
+        // 通常の行動決定
         agent.RequestDecision();
-
-        // エージェントが行動を決定するまで待機
         await UniTask.WaitUntil(() => agent.HasAction);
+    }
 
-        int x = agent.SelectedActionX;
-        int z = agent.SelectedActionZ;
+    int x = agent.SelectedActionX;
+    int z = agent.SelectedActionZ;
 
-        int height = gridManager.GetAvailableHeight(x, z);
-        if (height != -1)
+    int height = gridManager.GetAvailableHeight(x, z);
+    if (height != -1)
+    {
+        Vector3 polePosition = gridManager.GetPolePosition(x, z);
+        GameObject cube = agent.playerID == WHITE ? whiteCube : blackCube;
+
+        gridManager.PlaceCube(polePosition, x, height, z, agent.playerID, cube);
+
+        // 勝利条件のチェック
+        if (winChecker.CheckWinCondition(gridManager.Grid, x, height, z, agent.playerID))
         {
-            // 相手がリーチを持っているかを確認
-            CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
-            bool opponentHadReach = winChecker.HasPlayerReach(gridManager.Grid, opponentAgent.playerID);
+            Debug.Log(agent.playerID == WHITE ? "白の勝ち (CPU)" : "黒の勝ち (CPU)");
 
-            Vector3 polePosition = gridManager.GetPolePosition(x, z);
-            GameObject cube = agent.playerID == WHITE ? whiteCube : blackCube;
-
-            gridManager.PlaceCube(polePosition, x, height, z, agent.playerID, cube);
-
-            // 勝利条件のチェック
-            if (winChecker.CheckWinCondition(gridManager.Grid, x, height, z, agent.playerID))
-            {
-                Debug.Log(agent.playerID == WHITE ? "白の勝ち (CPU)" : "黒の勝ち (CPU)");
-
-                // 勝利したエージェントに正の報酬を与え、エピソードを終了
-                agent.SetReward(1.0f);
-                agent.EndEpisode();
-
-                // 敗北したエージェントに負の報酬を与え、エピソードを終了
-                opponentAgent.SetReward(-1.0f);
-                opponentAgent.EndEpisode();
-
-                gameEnded = true;
-                await UniTask.Delay(1000); // 少し待機してからリセット
-                ResetGame();
-                return;
-            }
-
-            // 引き分け判定
-            if (gridManager.IsFull())
-            {
-                // 両方のエージェントに引き分けの報酬を与え、エピソードを終了
-                agent.SetReward(0.0f);
-                agent.EndEpisode();
-
-                opponentAgent.SetReward(0.0f);
-                opponentAgent.EndEpisode();
-
-                gameEnded = true;
-                await UniTask.Delay(1000); // 少し待機してからリセット
-                ResetGame();
-                return;
-            }
-
-            // === 自分のリーチに対する報酬を追加 ===
-
-            // 自分がリーチを持っているかを確認
-            bool agentHasReach = winChecker.HasPlayerReach(gridManager.Grid, agent.playerID);
-
-            if (agentHasReach)
-            {
-                // 自分のリーチを作成した場合の報酬
-                agent.AddReward(0.1f); // 報酬値は適宜調整
-            }
-
-            // 相手のリーチを阻止したかを確認
-            if (opponentHadReach)
-            {
-                bool opponentHasReachNow = winChecker.HasPlayerReach(gridManager.Grid, opponentAgent.playerID);
-
-                if (!opponentHasReachNow)
-                {
-                    // 相手のリーチを阻止した場合の報酬
-                    agent.AddReward(0.2f); // 報酬値は適宜調整
-                }
-            }
-
-            agent.HasAction = false; // 行動フラグをリセット
-            // ターンを切り替え
-            currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
-        }
-        else
-        {
-            // 無効な行動へのペナルティ
-            agent.SetReward(-1.0f);
+            agent.SetReward(1.0f);
             agent.EndEpisode();
 
-            // 相手エージェントに勝利の報酬を与える
             CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
-            opponentAgent.SetReward(1.0f);
+            opponentAgent.SetReward(-1.0f);
             opponentAgent.EndEpisode();
 
             gameEnded = true;
-            await UniTask.Delay(1000); // 少し待機してからリセット
+            await UniTask.Delay(1000); 
             ResetGame();
             return;
         }
+
+        // 引き分け判定
+        if (gridManager.IsFull())
+        {
+            agent.SetReward(0.0f);
+            agent.EndEpisode();
+
+            CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
+            opponentAgent.SetReward(0.0f);
+            opponentAgent.EndEpisode();
+
+            gameEnded = true;
+            await UniTask.Delay(1000); 
+            ResetGame();
+            return;
+        }
+
+        agent.HasAction = false; 
+        currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
     }
+    else
+    {
+        // 無効な行動へのペナルティ
+        agent.SetReward(-1.0f);
+        agent.EndEpisode();
+
+        CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
+        opponentAgent.SetReward(1.0f);
+        opponentAgent.EndEpisode();
+
+        gameEnded = true;
+        await UniTask.Delay(1000); 
+        ResetGame();
+    }
+}
 
 
 

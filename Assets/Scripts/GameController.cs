@@ -25,7 +25,6 @@ public class GameController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // シーンが切り替わらない場合は不要
         }
         else
         {
@@ -87,13 +86,27 @@ public class GameController : MonoBehaviour
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
     {
-        agent.RequestDecision(); // エージェントに行動を要求
+        // Check if the opponent (WHITE) is about to win
+        var (reachX, reachZ) = winChecker.FindOpponentReach(gridManager.Grid, WHITE);
 
-        // エージェントが行動を決定するまで待機
-        await UniTask.WaitUntil(() => agent.HasAction);
+        int x, z;
 
-        int x = agent.SelectedActionX;
-        int z = agent.SelectedActionZ;
+        if (reachX != -1 && reachZ != -1)
+        {
+            // Block the opponent's reach
+            x = reachX;
+            z = reachZ;
+            Debug.Log("エージェントが相手のリーチを防ぎます");
+        }
+        else
+        {
+            // Normal agent decision
+            agent.RequestDecision(); // エージェントに行動を要求
+            await UniTask.WaitUntil(() => agent.HasAction);
+
+            x = agent.SelectedActionX;
+            z = agent.SelectedActionZ;
+        }
 
         int height = gridManager.GetAvailableHeight(x, z);
         if (height != -1)

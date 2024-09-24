@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InputHandler
 {
@@ -7,6 +8,8 @@ public class InputHandler
     private Camera camera_object;
     private GameObject _baseObject;
 
+    public bool isClickable = true;
+    
     public event Action<GameObject, Vector2Int> OnPoleClicked;
 
     public InputHandler()
@@ -23,7 +26,7 @@ public class InputHandler
 
     private void ClickPole()
     {
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && isClickable)
         {
             Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))

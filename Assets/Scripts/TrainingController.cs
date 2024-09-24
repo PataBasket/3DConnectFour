@@ -102,55 +102,92 @@ public class TrainingController : MonoBehaviour
     }
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
+{
+    // リーチをチェック
+    int opponentPlayerID = (agent.playerID == WHITE) ? BLACK : WHITE;
+    (int reachX, int reachZ) = winChecker.FindOpponentReach(gridManager.Grid, opponentPlayerID);
+
+    // 相手がリーチしている場合、その位置をブロックする
+    if (reachX != -1 && reachZ != -1)
     {
-        agent.RequestDecision(); // エージェントに行動を要求
-
-        // エージェントが行動を決定するまで待機
-        await UniTask.WaitUntil(() => agent.HasAction);
-
-        int x = agent.SelectedActionX;
-        int z = agent.SelectedActionZ;
-
-        int height = gridManager.GetAvailableHeight(x, z);
-        if (height != -1)
-        {
-            Vector3 polePosition = gridManager.GetPolePosition(x, z);
-            GameObject cube = agent.playerID == WHITE ? whiteCube : blackCube;
-
-            gridManager.PlaceCube(polePosition, x, height, z, agent.playerID, cube);
-
-            if (winChecker.CheckWinCondition(gridManager.Grid, x, height, z, agent.playerID))
-            {
-                Debug.Log(agent.playerID == WHITE ? "白の勝ち (CPU)" : "黒の勝ち (CPU)");
-                agent.SetReward(1.0f);
-                agent.EndEpisode();
-                gameEnded = true;
-                await UniTask.Delay(1000); // 少し待機してからリセット
-                ResetGame();
-                return;
-            }
-
-            // 引き分け判定
-            if (gridManager.IsFull())
-            {
-                agent.SetReward(0.0f);
-                agent.EndEpisode();
-                gameEnded = true;
-                await UniTask.Delay(1000); // 少し待機してからリセット
-                ResetGame();
-                return;
-            }
-
-            agent.HasAction = false; // 行動フラグをリセット
-            currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
-        }
-        else
-        {
-            // 無効な行動へのペナルティ
-            agent.SetReward(-0.1f);
-            agent.HasAction = false; // 行動フラグをリセット
-        }
+        // 相手がリーチしているので防ぐ
+        agent.SelectedActionX = reachX;
+        agent.SelectedActionZ = reachZ;
+        agent.HasAction = true;
     }
+    else
+    {
+        // 通常の行動決定
+        agent.RequestDecision();
+        await UniTask.WaitUntil(() => agent.HasAction);
+    }
+
+    int x = agent.SelectedActionX;
+    int z = agent.SelectedActionZ;
+
+    int height = gridManager.GetAvailableHeight(x, z);
+    if (height != -1)
+    {
+        Vector3 polePosition = gridManager.GetPolePosition(x, z);
+        GameObject cube = agent.playerID == WHITE ? whiteCube : blackCube;
+
+        gridManager.PlaceCube(polePosition, x, height, z, agent.playerID, cube);
+
+        // 勝利条件のチェック
+        if (winChecker.CheckWinCondition(gridManager.Grid, x, height, z, agent.playerID))
+        {
+            Debug.Log(agent.playerID == WHITE ? "白の勝ち (CPU)" : "黒の勝ち (CPU)");
+
+            agent.SetReward(1.0f);
+            agent.EndEpisode();
+
+            CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
+            opponentAgent.SetReward(-1.0f);
+            opponentAgent.EndEpisode();
+
+            gameEnded = true;
+            await UniTask.Delay(1000); 
+            ResetGame();
+            return;
+        }
+
+        // 引き分け判定
+        if (gridManager.IsFull())
+        {
+            agent.SetReward(0.0f);
+            agent.EndEpisode();
+
+            CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
+            opponentAgent.SetReward(0.0f);
+            opponentAgent.EndEpisode();
+
+            gameEnded = true;
+            await UniTask.Delay(1000); 
+            ResetGame();
+            return;
+        }
+
+        agent.HasAction = false; 
+        currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
+    }
+    else
+    {
+        // 無効な行動へのペナルティ
+        agent.SetReward(-1.0f);
+        agent.EndEpisode();
+
+        CubeAgent opponentAgent = (agent == cpuAgent1) ? cpuAgent2 : cpuAgent1;
+        opponentAgent.SetReward(1.0f);
+        opponentAgent.EndEpisode();
+
+        gameEnded = true;
+        await UniTask.Delay(1000); 
+        ResetGame();
+    }
+}
+
+
+
 
     private void ResetGame()
     {
@@ -158,13 +195,12 @@ public class TrainingController : MonoBehaviour
         currentPlayer = WHITE; // WHITEから再開
         gameEnded = false;
 
-        // エージェントのエピソードを管理
-        cpuAgent1.EndEpisode();
-        cpuAgent2.EndEpisode();
+        // エージェントのエピソードを終了する必要はない
 
         // キューブを削除
         ClearCubes();
     }
+
 
     private void ClearCubes()
     {

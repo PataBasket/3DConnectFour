@@ -140,6 +140,10 @@ public class UIManager : MonoBehaviour
     
     void OnBackButtonClicked()
     {
+        _mainCamera.GetComponent<CameraController>().enabled = false;
+        _isBaseActive = false;
+        _inputHandler.isClickable = true;
+        
         // チュートリアルのテキストやボタンをフェードアウトで非表示にする
         tutorialPages[_tutorialIndex].GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() =>
         {

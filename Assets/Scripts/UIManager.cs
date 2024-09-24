@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour
+public class TitleManager : MonoBehaviour
 {
     [SerializeField] private GameObject titleText;
     [SerializeField] private GameObject mainMenuButton;
@@ -15,6 +16,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject rightArrow;
     [SerializeField] private GameObject backButton;
     [SerializeField] private List<GameObject> tutorialPages = new List<GameObject>();
+    [SerializeField] private GameObject whiteCube;
 
     [SerializeField] 
     private Camera _mainCamera;
@@ -36,6 +38,10 @@ public class UIManager : MonoBehaviour
 
     private TitleBaseController _titleBaseController;
     private InputHandler _inputHandler;
+    private GridManager _gridManager;
+    
+    private const int WHITE = 1;
+    private const int BLACK = -1;
 
     // Baseのドラッグ操作を可能にする変数
     private bool _isBaseActive = false;
@@ -46,19 +52,25 @@ public class UIManager : MonoBehaviour
         // Tutorialボタンにクリックイベントを追加
         tutorialButton.GetComponent<Button>().onClick.AddListener(() => OnTutorialButtonClicked());
         backButton.GetComponent<Button>().onClick.AddListener(() => OnBackButtonClicked());
+        newGameButton.GetComponent<Button>().onClick.AddListener(() => OnClickNewGame());
         
         _titleBaseController = gameObject.GetComponent<TitleBaseController>();
         _inputHandler = new InputHandler();
+        _gridManager = GridManager.Instance;
         
         // チュートリアルUI要素を非表示に設定
         leftArrow.SetActive(false);
         rightArrow.SetActive(false);
         backButton.SetActive(false);
+        
+        _gridManager.InitializeArray();
+        _gridManager.InitializePoleMapping();
+        _inputHandler.OnPoleClicked += PlaceCubeObject;
     }
 
     private void Update()
     {
-        if (_isBaseActive == true)
+        if (_isBaseActive)
         {
             _inputHandler.Update();
         }
@@ -117,6 +129,10 @@ public class UIManager : MonoBehaviour
             {
                 rightArrow.GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() => rightArrow.SetActive(false));
             }
+            else if (_tutorialIndex == 1)
+            {
+                _inputHandler.isClickable = true;
+            }
         });
     }
     
@@ -135,6 +151,10 @@ public class UIManager : MonoBehaviour
             {
                 leftArrow.GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() => leftArrow.SetActive(false));
             }
+            else if (_tutorialIndex == 1)
+            {
+                _inputHandler.isClickable = true;
+            }
         });
     }
     
@@ -142,11 +162,11 @@ public class UIManager : MonoBehaviour
     {
         _mainCamera.GetComponent<CameraController>().enabled = false;
         _isBaseActive = false;
-        _inputHandler.isClickable = true;
         
         // チュートリアルのテキストやボタンをフェードアウトで非表示にする
         tutorialPages[_tutorialIndex].GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() =>
         {
+            ClearCubes();
             leftArrow.GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() => leftArrow.SetActive(false));
             rightArrow.GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() => rightArrow.SetActive(false));
             backButton.GetComponent<CanvasGroup>().DOFade(0, 0.5f).OnComplete(() =>
@@ -167,5 +187,30 @@ public class UIManager : MonoBehaviour
                 tutorialButton.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
             });
         });
+    }
+
+    private void PlaceCubeObject(GameObject clickedPole, Vector2Int gridIndex)
+    {
+        int height = _gridManager.GetAvailableHeight(gridIndex.x, gridIndex.y);
+
+        if (height != -1)
+        {
+            Vector3 polePosition = clickedPole.transform.position;
+            GameObject cube = whiteCube;
+            _gridManager.PlaceCube(polePosition, gridIndex.x, height, gridIndex.y, WHITE, cube);
+        }
+    }
+    private void ClearCubes()
+    {
+        GameObject[] cubes = GameObject.FindGameObjectsWithTag("Cube");
+        foreach (GameObject cube in cubes)
+        {
+            Destroy(cube);
+        }
+    }
+
+    void OnClickNewGame()
+    {
+        SceneManager.LoadScene("Main_Standard");
     }
 }

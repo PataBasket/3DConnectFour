@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     private GridManager gridManager;
     private InputHandler inputHandler;
     private WinChecker winChecker;
+    private UIManager _uiManager;
 
     private const int WHITE = 1;
     private const int BLACK = -1;
@@ -17,7 +18,9 @@ public class GameController : MonoBehaviour
     public CubeAgent cpuAgent; // エージェント（BLACK）
 
     private bool gameEnded = false; // ゲーム終了フラグ
-
+    private Camera _mainCamera;
+    private GameObject _mainCanvas;
+    
     public static GameController Instance { get; private set; }
 
     void Awake()
@@ -44,6 +47,9 @@ public class GameController : MonoBehaviour
         gridManager.InitializePoleMapping();
 
         inputHandler.OnPoleClicked += HandlePoleClick;
+        
+        _mainCanvas = GameObject.Find("Canvas");
+        _uiManager = _mainCanvas.GetComponent<UIManager>();
     }
 
     void Update()
@@ -74,7 +80,8 @@ public class GameController : MonoBehaviour
                 Debug.Log("プレイヤー（白）の勝ち");
                 gameEnded = true;
                 await UniTask.Delay(1000);
-                ResetGame();
+                _uiManager.ShowResult(0);
+                // ResetGame();
                 return;
             }
 

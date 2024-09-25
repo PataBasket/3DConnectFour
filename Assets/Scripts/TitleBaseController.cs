@@ -47,7 +47,7 @@ public class TitleBaseController : MonoBehaviour
         }
     }
 
-    private void StartAnimation()
+    public void StartAnimation()
     {
         // 上下運動のTweenを開始
         moveTween = baseObject.DOMoveY(baseObject.position.y + moveDistance, moveDuration)

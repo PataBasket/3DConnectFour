@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Unity.MLAgents;
+using DG.Tweening;
 
 public class GameController : MonoBehaviour
 {
@@ -18,8 +19,9 @@ public class GameController : MonoBehaviour
     public CubeAgent cpuAgent; // エージェント（BLACK）
 
     private bool gameEnded = false; // ゲーム終了フラグ
-    private Camera _mainCamera;
     private GameObject _mainCanvas;
+    private GameObject _mainCamera;
+    private GameObject _baseObject;
     
     public static GameController Instance { get; private set; }
 
@@ -50,6 +52,9 @@ public class GameController : MonoBehaviour
         
         _mainCanvas = GameObject.Find("Canvas");
         _uiManager = _mainCanvas.GetComponent<UIManager>();
+
+        _mainCamera = GameObject.Find("Main Camera");
+        _baseObject = GameObject.Find("Base");
     }
 
     void Update()
@@ -80,6 +85,12 @@ public class GameController : MonoBehaviour
                 Debug.Log("プレイヤー（白）の勝ち");
                 gameEnded = true;
                 await UniTask.Delay(1000);
+
+                inputHandler.isClickable = false;
+                _mainCamera.GetComponent<CameraController>().enabled = false;
+                _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
+                _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
+                
                 _uiManager.ShowResult(0);
                 // ResetGame();
                 return;
@@ -128,7 +139,14 @@ public class GameController : MonoBehaviour
                 Debug.Log("エージェント（黒）の勝ち");
                 gameEnded = true;
                 await UniTask.Delay(1000);
-                ResetGame();
+                
+                inputHandler.isClickable = false; 
+                _mainCamera.GetComponent<CameraController>().enabled = false;
+                _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
+                _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
+                
+                _uiManager.ShowResult(1);
+                // ResetGame();
                 return;
             }
 
@@ -138,7 +156,14 @@ public class GameController : MonoBehaviour
                 Debug.Log("引き分け");
                 gameEnded = true;
                 await UniTask.Delay(1000);
-                ResetGame();
+                
+                inputHandler.isClickable = false;
+                _mainCamera.GetComponent<CameraController>().enabled = false;
+                _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
+                _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
+                
+                _uiManager.ShowResult(2);
+                // ResetGame();
                 return;
             }
 

@@ -104,6 +104,9 @@ public class GameController : MonoBehaviour
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
     {
+        // 1秒間の待機
+        await UniTask.Delay(1500);
+        
         // Check if the opponent (WHITE) is about to win
         var (reachX, reachZ) = winChecker.FindOpponentReach(gridManager.Grid, WHITE);
 

@@ -17,6 +17,8 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private GameObject backButton;
     [SerializeField] private List<GameObject> tutorialPages = new List<GameObject>();
     [SerializeField] private GameObject whiteCube;
+    [SerializeField] private AudioSource a1;
+    [SerializeField] private List<AudioClip> soundEffects = new List<AudioClip>();
 
     [SerializeField] 
     private Camera _mainCamera;
@@ -78,6 +80,7 @@ public class TitleManager : MonoBehaviour
 
     void OnTutorialButtonClicked()
     {
+        SE1();
         _titleBaseController.StopAnimation();
         _tutorialIndex = 0;
         
@@ -116,6 +119,7 @@ public class TitleManager : MonoBehaviour
 
     public void OnClickRightArrow()
     {
+        SE2();
         if (_tutorialIndex == 0)
         {
             leftArrow.SetActive(true);
@@ -138,6 +142,7 @@ public class TitleManager : MonoBehaviour
     
     public void OnClickLeftArrow()
     {
+        SE2();
         if (_tutorialIndex == 2)
         {
             rightArrow.SetActive(true);
@@ -160,6 +165,7 @@ public class TitleManager : MonoBehaviour
     
     void OnBackButtonClicked()
     {
+        SE1();
         _mainCamera.GetComponent<CameraController>().enabled = false;
         _isBaseActive = false;
         
@@ -191,6 +197,7 @@ public class TitleManager : MonoBehaviour
 
     private void PlaceCubeObject(GameObject clickedPole, Vector2Int gridIndex)
     {
+        SE3();
         int height = _gridManager.GetAvailableHeight(gridIndex.x, gridIndex.y);
 
         if (height != -1)
@@ -211,6 +218,27 @@ public class TitleManager : MonoBehaviour
 
     void OnClickNewGame()
     {
-        SceneManager.LoadScene("Main_Standard");
+        SE1();
+        DOVirtual.DelayedCall(0.5f, () => {
+            SceneManager.LoadScene("Main_Standard");
+        });
+    }
+    
+    //自作の関数1
+    private void SE1()
+    {
+        a1.PlayOneShot(soundEffects[0]);
+    }
+
+    //自作の関数2
+    private void SE2()
+    {
+        a1.PlayOneShot(soundEffects[1]);
+    }
+
+    //自作の関数3
+    private void SE3()
+    {
+        a1.PlayOneShot(soundEffects[2]); //a3にアタッチしたAudioSourceの設定値でb3にアタッチした効果音を再生
     }
 }

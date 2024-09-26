@@ -66,6 +66,7 @@ public class GameController : MonoBehaviour
     {
         if (currentPlayer == WHITE)
         {
+            _uiManager.SE3();
             ProcessPlayerMove(clickedPole, gridIndex).Forget();
         }
     }
@@ -104,6 +105,10 @@ public class GameController : MonoBehaviour
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
     {
+        // 1秒間の待機
+        await UniTask.Delay(1500);
+        _uiManager.SE3();
+        
         // Check if the opponent (WHITE) is about to win
         var (reachX, reachZ) = winChecker.FindOpponentReach(gridManager.Grid, WHITE);
 

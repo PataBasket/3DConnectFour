@@ -244,6 +244,11 @@ MonoBehaviour:
   - {fileID: 1949464880}
   menuButton: {fileID: 716220030}
   newGameButton: {fileID: 1384771497}
+  a1: {fileID: 1532791962}
+  soundEffects:
+  - {fileID: 8300000, guid: 139c074c91fa54b4d9445d5d3eb6a0a8, type: 3}
+  - {fileID: 8300000, guid: 68cf5ed261396cc46bd7e0801ce0f238, type: 3}
+  - {fileID: 8300000, guid: 0befdb2915ee7264392569886636365a, type: 3}
 --- !u!1 &221356906
 GameObject:
   m_ObjectHideFlags: 0

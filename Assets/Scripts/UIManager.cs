@@ -11,6 +11,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button menuButton;
     [SerializeField] private Button newGameButton;
     
+    [SerializeField] private AudioSource a1;
+    [SerializeField] private List<AudioClip> soundEffects = new List<AudioClip>();
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -37,11 +40,37 @@ public class UIManager : MonoBehaviour
 
     private void OnClickMenu()
     {
-        SceneManager.LoadScene("StartScene");
+        SE1();
+        // 0.5秒待ってからシーンをロード
+        DOVirtual.DelayedCall(0.5f, () => {
+            SceneManager.LoadScene("StartScene");
+        });
     }
 
     private void OnClickNewGame()
     {
-        SceneManager.LoadScene("Main_Standard");
+        SE1();
+        // 0.5秒待ってからシーンをロード
+        DOVirtual.DelayedCall(0.5f, () => {
+            SceneManager.LoadScene("Main_Standard");
+        });
+    }
+    
+    //自作の関数1
+    private void SE1()
+    {
+        a1.PlayOneShot(soundEffects[0]);
+    }
+
+    //自作の関数2
+    private void SE2()
+    {
+        a1.PlayOneShot(soundEffects[1]);
+    }
+
+    //自作の関数3
+    public void SE3()
+    {
+        a1.PlayOneShot(soundEffects[2]); //a3にアタッチしたAudioSourceの設定値でb3にアタッチした効果音を再生
     }
 }

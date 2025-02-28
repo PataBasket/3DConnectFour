@@ -43,36 +43,36 @@ public class WinChecker
         return false;
     }
     
-    // リーチ（3つ並べる）の検出
-    public bool CheckReachCondition(int[,,] grid, int x, int y, int z, int player)
-    {
-        // 方向の組み合わせをすべてチェック
-        int[][] directions = new int[][]
-        {
-            new int[] {1, 0, 0},
-            new int[] {0, 1, 0},
-            new int[] {0, 0, 1},
-            new int[] {1, 1, 0},
-            new int[] {1, 0, 1},
-            new int[] {0, 1, 1},
-            new int[] {-1, 1, 0},
-            new int[] {-1, 0, 1},
-            new int[] {0, -1, 1},
-            new int[] {1, 1, 1},
-            new int[] {-1, 1, 1},
-            new int[] {1, 1, -1},
-            new int[] {1, -1, -1}
-        };
-
-        foreach (var dir in directions)
-        {
-            if (CheckLineForReach(grid, x, y, z, dir[0], dir[1], dir[2], player))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    // // リーチ（3つ並べる）の検出
+    // public bool CheckReachCondition(int[,,] grid, int x, int y, int z, int player)
+    // {
+    //     // 方向の組み合わせをすべてチェック
+    //     int[][] directions = new int[][]
+    //     {
+    //         new int[] {1, 0, 0},
+    //         new int[] {0, 1, 0},
+    //         new int[] {0, 0, 1},
+    //         new int[] {1, 1, 0},
+    //         new int[] {1, 0, 1},
+    //         new int[] {0, 1, 1},
+    //         new int[] {-1, 1, 0},
+    //         new int[] {-1, 0, 1},
+    //         new int[] {0, -1, 1},
+    //         new int[] {1, 1, 1},
+    //         new int[] {-1, 1, 1},
+    //         new int[] {1, 1, -1},
+    //         new int[] {1, -1, -1}
+    //     };
+    //
+    //     foreach (var dir in directions)
+    //     {
+    //         if (CheckLineForReach(grid, x, y, z, dir[0], dir[1], dir[2], player))
+    //         {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     private bool CheckLineForReach(int[,,] grid, int x, int y, int z, int dx, int dy, int dz, int player)
     {
@@ -129,7 +129,7 @@ public class WinChecker
                 {
                     // 仮にこの場所に相手が置いた場合リーチが完成するかどうか
                     grid[x, height, z] = opponentPlayerID; // 仮に置く
-                    bool isReach = CheckReachCondition(grid, x, height, z, opponentPlayerID);
+                    bool isReach = CheckWinCondition(grid, x, height, z, opponentPlayerID);
                     grid[x, height, z] = 0; // 元に戻す
 
                     if (isReach)

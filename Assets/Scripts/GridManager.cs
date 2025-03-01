@@ -4,8 +4,11 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     private const int EMPTY = 0;
+    private const int DANGER = -2;
     public const int SIZE = 4;
     public const int HEIGHT = 4; // 高さの定義を追加
+    
+    private int dangerX, dangerY, dangerZ;
 
     public static GridManager Instance { get; private set; }
 
@@ -62,7 +65,15 @@ public class GridManager : MonoBehaviour
     {
         for (int y = 0; y < HEIGHT; y++)
         {
-            if (Grid[x, y, z] == EMPTY)
+            if (Grid[x, y, z] == DANGER)
+            {
+                dangerX = x;
+                dangerY = y;
+                dangerZ = z;
+
+                return y;
+            }
+            else if (Grid[x, y, z] == EMPTY)
             {
                 return y;
             }
@@ -73,6 +84,13 @@ public class GridManager : MonoBehaviour
     // キューブを配置
     public void PlaceCube(Vector3 polePosition, int x, int y, int z, int player, GameObject cubePrefab)
     {
+        if (Grid[x, y, z] == DANGER && player != DANGER)
+        {
+            GameObject pole = GameObject.Find("pole_" + x + "_" + z);
+            int childCount = pole.transform.childCount;
+            GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
+            Destroy(dangerCube);
+        }
         Grid[x, y, z] = player;
         GameObject cube = Instantiate(cubePrefab);
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);

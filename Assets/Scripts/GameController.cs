@@ -12,10 +12,12 @@ public class GameController : MonoBehaviour
 
     private const int WHITE = 1;
     private const int BLACK = -1;
+    private const int DANGER = -2;
     public int currentPlayer = WHITE; // プレイヤーがWHITE
 
     public GameObject whiteCube;
     public GameObject blackCube;
+    public GameObject dangerCube;
     public CubeAgent cpuAgent; // エージェント（BLACK）
 
     private bool gameEnded = false; // ゲーム終了フラグ
@@ -73,6 +75,8 @@ public class GameController : MonoBehaviour
 
     private async UniTaskVoid ProcessPlayerMove(GameObject clickedPole, Vector2Int gridIndex)
     {
+        
+        
         int height = gridManager.GetAvailableHeight(gridIndex.x, gridIndex.y);
 
         if (height != -1)
@@ -173,6 +177,29 @@ public class GameController : MonoBehaviour
             }
 
             agent.HasAction = false; // 行動フラグをリセット
+            
+            // Find Danger Position
+            var (dangerX, dangerZ) = winChecker.FindOpponentReach(gridManager.Grid, BLACK);
+
+            int danger_x, danger_z;
+        
+            if (dangerX != -1 && dangerZ != -1)
+            {
+                // Block the opponent's reach
+                danger_x = dangerX;
+                danger_z = dangerZ;
+                Debug.Log("There is a danger position");
+
+                int dangerHeight = gridManager.GetAvailableHeight(danger_x, danger_z);
+                if (dangerHeight != -1)
+                {
+                    Vector3 danger_polePosition = gridManager.GetPolePosition(danger_x, danger_z);
+                    GameObject danger_cube = dangerCube;
+
+                    gridManager.PlaceCube(danger_polePosition, danger_x, dangerHeight, danger_z, DANGER, danger_cube);
+                }
+            }
+            
             currentPlayer = WHITE;
         }
         else

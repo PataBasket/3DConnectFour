@@ -830,6 +830,7 @@ MonoBehaviour:
   currentPlayer: 1
   whiteCube: {fileID: 6842950758685996816, guid: dcca304969fb3fd44a59b06841af3b0e, type: 3}
   blackCube: {fileID: 6842950758685996816, guid: 5c324cc6cbd6cfb4ea6e96a15e101866, type: 3}
+  dangerCube: {fileID: 57768587889760660, guid: 9cb9fb1e16d6ee04f81fa6b0b7991571, type: 3}
   cpuAgent: {fileID: 989570783}
 --- !u!114 &727240141
 MonoBehaviour:

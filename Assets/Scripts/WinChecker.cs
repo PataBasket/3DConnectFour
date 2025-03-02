@@ -1,3 +1,5 @@
+using UnityEngine;
+using System.Collections.Generic;
 public class WinChecker
 {
     private const int SIZE = 4;
@@ -68,5 +70,95 @@ public class WinChecker
         }
         return (-1, -1); // リーチがない場合
     }
+    
+    // 【変更・追加箇所】 WinChecker.cs にエージェントのリーチ状態（連続した3つのキューブ）の座標を返すメソッドを追加
+    public List<Vector3Int> FindAgentReachCubePositions(int[,,] grid, int player)
+    {
+        List<Vector3Int> reachPositions = new List<Vector3Int>();
+        // CheckLine で使用している方向リスト（順序は CheckWinCondition と同じ）
+        int[,] directions = new int[,] {
+            {1, 0, 0},
+            {0, 1, 0},
+            {0, 0, 1},
+            {1, 1, 0},
+            {1, 0, 1},
+            {0, 1, 1},
+            {-1, 1, 0},
+            {-1, 0, 1},
+            {0, -1, 1},
+            {1, 1, 1},
+            {-1, 1, 1},
+            {1, 1, -1},
+            {1, -1, -1}
+        };
+
+        // 盤面は 4x4x4 なので、WinChecker 内部の SIZE (4) を利用
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 4; y++)
+            {
+                for (int z = 0; z < 4; z++)
+                {
+                    // 各方向について4セル分の連続をチェック
+                    for (int d = 0; d < directions.GetLength(0); d++)
+                    {
+                        int dx = directions[d, 0];
+                        int dy = directions[d, 1];
+                        int dz = directions[d, 2];
+
+                        List<Vector3Int> positions = new List<Vector3Int>();
+                        int countPlayer = 0;
+                        int countEmpty = 0;
+
+                        // 4セル分のシーケンスをチェック
+                        for (int i = 0; i < 4; i++)
+                        {
+                            int nx = x + i * dx;
+                            int ny = y + i * dy;
+                            int nz = z + i * dz;
+
+                            // 範囲外ならこの方向は無効
+                            if (nx < 0 || nx >= 4 || ny < 0 || ny >= 4 || nz < 0 || nz >= 4)
+                            {
+                                positions = null;
+                                break;
+                            }
+                            positions.Add(new Vector3Int(nx, ny, nz));
+                            int cell = grid[nx, ny, nz];
+                            if (cell == player)
+                            {
+                                countPlayer++;
+                            }
+                            else if (cell == 0 || cell == -2) // EMPTY または DANGER とみなす
+                            {
+                                countEmpty++;
+                            }
+                            else
+                            {
+                                // 相手の駒があれば無効
+                                positions = null;
+                                break;
+                            }
+                        }
+                        if (positions != null && countPlayer == 3 && countEmpty == 1)
+                        {
+                            // 連続している3つの駒の位置のみを返す（最初に見つかったリーチライン）
+                            List<Vector3Int> agentCubes = new List<Vector3Int>();
+                            foreach (var pos in positions)
+                            {
+                                if (grid[pos.x, pos.y, pos.z] == player)
+                                {
+                                    agentCubes.Add(pos);
+                                }
+                            }
+                            return agentCubes;
+                        }
+                    }
+                }
+            }
+        }
+        return reachPositions;
+    }
+
 
 }

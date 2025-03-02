@@ -2,6 +2,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Unity.MLAgents;
 using DG.Tweening;
+using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
@@ -35,6 +36,12 @@ public class GameController : MonoBehaviour
     }
 
     [SerializeField] private GameMode gameMode;
+    
+    // 【変更・追加箇所】 DangerCase2用：ハイライト中のキューブの元のマテリアルを保持するための辞書
+    private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+    // 【変更】DangerCase2用: 赤色マテリアルへの参照をインスペクターから設定
+    public Material redMaterial;
+
 
     void Awake()
     {
@@ -107,6 +114,12 @@ public class GameController : MonoBehaviour
                 _uiManager.ShowResult(0);
                 // ResetGame();
                 return;
+            }
+            
+            // 【変更・追加箇所】 DangerCase2 の場合、ユーザーの配置によって相手のリーチが防がれた際はハイライト解除
+            if (gameMode == GameMode.DangerCase2)
+            {
+                ClearDangerHighlight();
             }
 
             currentPlayer = BLACK;
@@ -208,6 +221,31 @@ public class GameController : MonoBehaviour
                 }
             }
             
+            // 【変更・追加箇所】 DangerCase2 の場合、エージェントのリーチ状態を検出してキューブのマテリアルを赤色に変更する処理
+            if (gameMode == GameMode.DangerCase2)
+            {
+                var reachPositions = winChecker.FindAgentReachCubePositions(gridManager.Grid, BLACK);
+                if (reachPositions.Count > 0)
+                {
+                    Debug.Log("エージェントのリーチ状態が検出されました。キューブを赤色にハイライトします。");
+                    foreach (var pos in reachPositions)
+                    {
+                        GameObject cubeObj = gridManager.GetCubeAt(pos.x, pos.y, pos.z);
+                        if (cubeObj != null)
+                        {
+                            Renderer rend = cubeObj.GetComponent<Renderer>();
+                            // 既にハイライトしていなければ元のマテリアルを保存
+                            if (!originalMaterials.ContainsKey(cubeObj))
+                            {
+                                originalMaterials[cubeObj] = rend.material;
+                            }
+                            // 赤いマテリアルに切り替え
+                            rend.material = redMaterial;
+                        }
+                    }
+                }
+            }
+            
             currentPlayer = WHITE;
         }
         else
@@ -216,6 +254,20 @@ public class GameController : MonoBehaviour
             agent.HasAction = false;
             await ProcessAgentMove(agent);
         }
+    }
+    
+    // 【変更・追加箇所】 DangerCase2 のハイライトを解除するためのメソッド
+    private void ClearDangerHighlight()
+    {
+        foreach (var kvp in originalMaterials)
+        {
+            if (kvp.Key != null)
+            {
+                Renderer rend = kvp.Key.GetComponent<Renderer>();
+                rend.material = kvp.Value;
+            }
+        }
+        originalMaterials.Clear();
     }
 
     private void ResetGame()

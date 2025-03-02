@@ -115,4 +115,23 @@ public class GridManager : MonoBehaviour
         }
         return true;
     }
+    
+    // 【変更・追加箇所】 GridManager.cs に新たなメソッド GetCubeAt を追加
+    public GameObject GetCubeAt(int x, int y, int z)
+    {
+        GameObject pole = GameObject.Find("pole_" + x + "_" + z);
+        if (pole != null)
+        {
+            foreach (Transform child in pole.transform)
+            {
+                // y座標が一致するキューブを返す（多少の誤差がある場合は Mathf.Approximately を使用）
+                if (Mathf.Approximately(child.position.y, y))
+                {
+                    return child.gameObject;
+                }
+            }
+        }
+        return null;
+    }
+
 }

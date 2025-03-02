@@ -27,6 +27,15 @@ public class GameController : MonoBehaviour
     
     public static GameController Instance { get; private set; }
 
+    public enum GameMode
+    {
+        Normal,
+        DangerCase1,
+        DangerCase2,
+    }
+
+    [SerializeField] private GameMode gameMode;
+
     void Awake()
     {
         if (Instance == null)
@@ -75,7 +84,6 @@ public class GameController : MonoBehaviour
 
     private async UniTaskVoid ProcessPlayerMove(GameObject clickedPole, Vector2Int gridIndex)
     {
-        
         
         int height = gridManager.GetAvailableHeight(gridIndex.x, gridIndex.y);
 
@@ -183,7 +191,7 @@ public class GameController : MonoBehaviour
 
             int danger_x, danger_z;
         
-            if (dangerX != -1 && dangerZ != -1)
+            if (dangerX != -1 && dangerZ != -1 && gameMode == GameMode.DangerCase1)
             {
                 // Block the opponent's reach
                 danger_x = dangerX;

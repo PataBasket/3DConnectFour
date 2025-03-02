@@ -199,7 +199,9 @@ public class GameController : MonoBehaviour
 
             agent.HasAction = false; // 行動フラグをリセット
             
-            // Find Danger Position
+            // ─────────────────────────────────────────────────────────────────────────────
+            // Danger Case 1
+            // ─────────────────────────────────────────────────────────────────────────────
             var (dangerX, dangerZ) = winChecker.FindOpponentReach(gridManager.Grid, BLACK);
 
             int danger_x, danger_z;
@@ -221,18 +223,23 @@ public class GameController : MonoBehaviour
                 }
             }
             
-            // 【変更・追加箇所】 DangerCase2 の場合、エージェントのリーチ状態を検出してキューブのマテリアルを赤色に変更する処理
+            // ─────────────────────────────────────────────────────────────────────────────
+            // Danger Case 2
+            // ─────────────────────────────────────────────────────────────────────────────
             if (gameMode == GameMode.DangerCase2)
             {
                 var reachPositions = winChecker.FindAgentReachCubePositions(gridManager.Grid, BLACK);
+                // Debug.Log(reachPositions.Count + "見つかりました");
                 if (reachPositions.Count > 0)
                 {
+                    Debug.Log("First: " + reachPositions[0] + ", Second: " + reachPositions[1] + ", Third: " + reachPositions[2]);
                     Debug.Log("エージェントのリーチ状態が検出されました。キューブを赤色にハイライトします。");
                     foreach (var pos in reachPositions)
                     {
                         GameObject cubeObj = gridManager.GetCubeAt(pos.x, pos.y, pos.z);
                         if (cubeObj != null)
                         {
+                            Debug.Log("hello");
                             Renderer rend = cubeObj.GetComponent<Renderer>();
                             // 既にハイライトしていなければ元のマテリアルを保存
                             if (!originalMaterials.ContainsKey(cubeObj))

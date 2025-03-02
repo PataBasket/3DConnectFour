@@ -92,7 +92,7 @@ public class WinChecker
             {1, -1, -1}
         };
 
-        // 盤面は 4x4x4 なので、WinChecker 内部の SIZE (4) を利用
+        // 盤面は 4x4x4 なので、内部で SIZE (4) を使用
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
@@ -131,7 +131,18 @@ public class WinChecker
                             }
                             else if (cell == 0 || cell == -2) // EMPTY または DANGER とみなす
                             {
-                                countEmpty++;
+                                // **修正箇所**: そのセルが実際に利用可能かチェック（その列の GetAvailableHeight と比較）
+                                int availableY = GridManager.Instance.GetAvailableHeight(nx, nz);
+                                if (availableY == ny)
+                                {
+                                    countEmpty++;
+                                }
+                                else
+                                {
+                                    // 利用可能高さと一致しない場合は、この並びは有効なリーチではない
+                                    positions = null;
+                                    break;
+                                }
                             }
                             else
                             {
@@ -148,9 +159,11 @@ public class WinChecker
                             {
                                 if (grid[pos.x, pos.y, pos.z] == player)
                                 {
+                                    Debug.Log("x: " + pos.x + ", y: " + pos.y + ", z: " + pos.z);
                                     agentCubes.Add(pos);
                                 }
                             }
+                            Debug.Log("first: " + agentCubes[0] + ", second: " + agentCubes[1] + ", third: " + agentCubes[2]);
                             return agentCubes;
                         }
                     }
@@ -159,6 +172,7 @@ public class WinChecker
         }
         return reachPositions;
     }
+
 
 
 }

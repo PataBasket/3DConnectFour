@@ -154,6 +154,13 @@ public class GameController : MonoBehaviour
             x = myReachX;
             z = myReachZ;
             Debug.Log("エージェントが勝ちます");
+            
+            // Delete danger cubes
+            GameObject[] dangerousObjects = GameObject.FindGameObjectsWithTag("Dangerous");
+            foreach (GameObject obj in dangerousObjects)
+            {
+                Destroy(obj);
+            }
         }
         else
         {

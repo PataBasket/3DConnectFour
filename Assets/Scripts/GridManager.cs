@@ -63,7 +63,7 @@ public class GridManager : MonoBehaviour
     {
         for (int y = 0; y < HEIGHT; y++)
         {
-            if (Grid[x, y, z] == EMPTY || Grid[x, y, z] == DANGER)
+            if (Grid[x, y, z] == DANGER || Grid[x, y, z] == EMPTY)
             {
                 return y;
             }
@@ -76,12 +76,15 @@ public class GridManager : MonoBehaviour
     {
         if (Grid[x, y, z] == DANGER && player != DANGER)
         {
+            Debug.Log("hi");
             GameObject pole = GameObject.Find("pole_" + x + "_" + z);
             int childCount = pole.transform.childCount;
             GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
             Destroy(dangerCube);
         }
         Grid[x, y, z] = player;
+        Debug.Log("x: " + x + ", y: " + y + ", z: " + z);
+        Debug.Log(Grid[x,y,z]);
         GameObject cube = Instantiate(cubePrefab);
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
         cube.transform.SetParent(GameObject.Find("pole_" + x + "_" + z).transform);

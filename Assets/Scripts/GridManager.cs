@@ -123,7 +123,6 @@ public class GridManager : MonoBehaviour
         GameObject pole = GameObject.Find("pole_" + x + "_" + z);
         if (pole != null)
         {
-            Debug.Log("hi");
             Transform[] allChildCubes = pole.GetComponentsInChildren<Transform>();
             GameObject reachCube = allChildCubes[allChildCubes.Length - y - 1].gameObject;
             return reachCube;

@@ -136,7 +136,10 @@ public class GameController : MonoBehaviour
         
         // Check if the opponent (WHITE) is about to win
         var (reachX, reachZ) = winChecker.FindOpponentReach(gridManager.Grid, WHITE);
-
+        
+        // Check if the agent (BLACK) is about to win
+        var (myReachX, myReachZ) = winChecker.FindOpponentReach(gridManager.Grid, BLACK);
+        
         int x, z;
 
         if (reachX != -1 && reachZ != -1)
@@ -145,6 +148,12 @@ public class GameController : MonoBehaviour
             x = reachX;
             z = reachZ;
             Debug.Log("エージェントが相手のリーチを防ぎます");
+        }
+        else if (myReachX != -1 && myReachZ != -1)
+        {
+            x = myReachX;
+            z = myReachZ;
+            Debug.Log("エージェントが勝ちます");
         }
         else
         {
@@ -239,7 +248,6 @@ public class GameController : MonoBehaviour
                         GameObject cubeObj = gridManager.GetCubeAt(pos.x, pos.y, pos.z);
                         if (cubeObj != null)
                         {
-                            Debug.Log("hello");
                             Renderer rend = cubeObj.GetComponent<Renderer>();
                             // 既にハイライトしていなければ元のマテリアルを保存
                             if (!originalMaterials.ContainsKey(cubeObj))

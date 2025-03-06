@@ -25,6 +25,11 @@ public class GameController : MonoBehaviour
     private GameObject _mainCanvas;
     private GameObject _mainCamera;
     private GameObject _baseObject;
+
+    private const int OVERALLTIMER = 1;
+    private const int DETECTIONTIMER = 2;
+    
+    
     
     public static GameController Instance { get; private set; }
 
@@ -73,6 +78,8 @@ public class GameController : MonoBehaviour
 
         _mainCamera = GameObject.Find("Main Camera");
         _baseObject = GameObject.Find("Base");
+        
+        StartTimerAsync(OVERALLTIMER).Forget();
     }
 
     void Update()
@@ -111,8 +118,10 @@ public class GameController : MonoBehaviour
                 _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
                 _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
                 
+                // timer処理
+                gridManager.stopFlagOverall = true;
+                
                 _uiManager.ShowResult(0);
-                // ResetGame();
                 return;
             }
             
@@ -191,8 +200,10 @@ public class GameController : MonoBehaviour
                 _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
                 _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
                 
+                // timer処理
+                gridManager.stopFlagOverall = true;
+                
                 _uiManager.ShowResult(1);
-                // ResetGame();
                 return;
             }
 
@@ -208,8 +219,10 @@ public class GameController : MonoBehaviour
                 _mainCamera.transform.DORotate(new Vector3(20, 0, 0), 0.5f);
                 _mainCamera.transform.DOMove(new Vector3(0, 3.736161f, -7.517541f), 0.5f);
                 
+                // timer処理
+                gridManager.stopFlagOverall = true;
+                
                 _uiManager.ShowResult(2);
-                // ResetGame();
                 return;
             }
 
@@ -236,6 +249,9 @@ public class GameController : MonoBehaviour
                     GameObject danger_cube = dangerCube;
 
                     gridManager.PlaceCube(danger_polePosition, danger_x, dangerHeight, danger_z, DANGER, danger_cube);
+                    
+                    // timer処理
+                    StartTimerAsync(DETECTIONTIMER).Forget();
                 }
             }
             
@@ -265,6 +281,9 @@ public class GameController : MonoBehaviour
                             rend.material = redMaterial;
                         }
                     }
+                    
+                    // timer処理
+                    StartTimerAsync(DETECTIONTIMER).Forget();
                 }
             }
             
@@ -290,6 +309,9 @@ public class GameController : MonoBehaviour
             }
         }
         originalMaterials.Clear();
+        
+        // timer処理
+        gridManager.stopFlagDetection = true;
     }
 
     private void ResetGame()
@@ -309,5 +331,30 @@ public class GameController : MonoBehaviour
         {
             Destroy(cube);
         }
+    }
+    
+    // 非同期でタイマーを開始するメソッド
+    public async UniTaskVoid StartTimerAsync(int timerNumber)
+    {
+        float startTime = Time.time;
+        Debug.Log($"timer{timerNumber} started: {startTime}");
+
+        // タイマー番号に応じたフラグの変更を待機
+        if (timerNumber == OVERALLTIMER)
+        {
+            await UniTask.WaitUntil(() => gridManager.stopFlagOverall, cancellationToken: this.GetCancellationTokenOnDestroy());
+        }
+        else if (timerNumber == DETECTIONTIMER)
+        {
+            await UniTask.WaitUntil(() => gridManager.stopFlagDetection, cancellationToken: this.GetCancellationTokenOnDestroy());
+        }
+
+        float endTime = Time.time;
+        Debug.Log($"timer{timerNumber} ended: {endTime}");
+        Debug.Log($"timer{timerNumber} lasted: {endTime - startTime}seconds");
+
+        // 次回に備えてフラグをリセット
+        if (timerNumber == OVERALLTIMER) gridManager.stopFlagOverall = false;
+        if (timerNumber == DETECTIONTIMER) gridManager.stopFlagDetection = false;
     }
 }

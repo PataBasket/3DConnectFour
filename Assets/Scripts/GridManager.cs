@@ -13,6 +13,10 @@ public class GridManager : MonoBehaviour
     // グリッドの状態を保持する3次元配列
     public int[,,] Grid { get; private set; } = new int[SIZE, HEIGHT, SIZE];
     private Dictionary<GameObject, Vector2Int> poleToGridMap = new Dictionary<GameObject, Vector2Int>();
+    
+    // 計測終了のフラグ
+    public bool stopFlagDetection = false;
+    public bool stopFlagOverall = false;
 
     void Awake()
     {
@@ -81,10 +85,13 @@ public class GridManager : MonoBehaviour
             int childCount = pole.transform.childCount;
             GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
             Destroy(dangerCube);
+            
+            // timer処理
+            stopFlagDetection = true;
         }
         Grid[x, y, z] = player;
-        Debug.Log("x: " + x + ", y: " + y + ", z: " + z);
-        Debug.Log(Grid[x,y,z]);
+        // Debug.Log("x: " + x + ", y: " + y + ", z: " + z);
+        // Debug.Log(Grid[x,y,z]);
         GameObject cube = Instantiate(cubePrefab);
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
         cube.transform.SetParent(GameObject.Find("pole_" + x + "_" + z).transform);
@@ -120,7 +127,6 @@ public class GridManager : MonoBehaviour
     }
     
     // 【変更・追加箇所】 GridManager.cs に新たなメソッド GetCubeAt を追加
-    // このMethodが正常に動いていない
     public GameObject GetCubeAt(int x, int y, int z)
     {
         GameObject pole = GameObject.Find("pole_" + x + "_" + z);
@@ -129,15 +135,6 @@ public class GridManager : MonoBehaviour
             Transform[] allChildCubes = pole.GetComponentsInChildren<Transform>();
             GameObject reachCube = allChildCubes[allChildCubes.Length - y - 1].gameObject;
             return reachCube;
-            // foreach (Transform child in pole.transform)
-            // {
-            //     // y座標が一致するキューブを返す（多少の誤差がある場合は Mathf.Approximately を使用）
-            //     if (Mathf.Approximately(child.position.y, y)) // ここ動いてない
-            //     {
-            //         Debug.Log("heyyy");
-            //         return child.gameObject;
-            //     }
-            // }
         }
         return null;
     }

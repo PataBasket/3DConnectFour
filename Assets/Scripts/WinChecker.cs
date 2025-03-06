@@ -159,11 +159,11 @@ public class WinChecker
                             {
                                 if (grid[pos.x, pos.y, pos.z] == player)
                                 {
-                                    Debug.Log("x: " + pos.x + ", y: " + pos.y + ", z: " + pos.z);
+                                    // Debug.Log("x: " + pos.x + ", y: " + pos.y + ", z: " + pos.z);
                                     agentCubes.Add(pos);
                                 }
                             }
-                            Debug.Log("first: " + agentCubes[0] + ", second: " + agentCubes[1] + ", third: " + agentCubes[2]);
+                            // Debug.Log("first: " + agentCubes[0] + ", second: " + agentCubes[1] + ", third: " + agentCubes[2]);
                             return agentCubes;
                         }
                     }

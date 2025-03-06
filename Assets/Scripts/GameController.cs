@@ -98,7 +98,6 @@ public class GameController : MonoBehaviour
 
     private async UniTaskVoid ProcessPlayerMove(GameObject clickedPole, Vector2Int gridIndex)
     {
-        
         int height = gridManager.GetAvailableHeight(gridIndex.x, gridIndex.y);
 
         if (height != -1)
@@ -125,7 +124,7 @@ public class GameController : MonoBehaviour
                 return;
             }
             
-            // 【変更・追加箇所】 DangerCase2 の場合、ユーザーの配置によって相手のリーチが防がれた際はハイライト解除
+            // DangerCase2 の場合、ユーザーの配置によって相手のリーチが防がれた際はハイライト解除
             if (gameMode == GameMode.DangerCase2)
             {
                 ClearDangerHighlight();
@@ -264,7 +263,7 @@ public class GameController : MonoBehaviour
                 // Debug.Log(reachPositions.Count + "見つかりました");
                 if (reachPositions.Count > 0)
                 {
-                    Debug.Log("First: " + reachPositions[0] + ", Second: " + reachPositions[1] + ", Third: " + reachPositions[2]);
+                    // Debug.Log("First: " + reachPositions[0] + ", Second: " + reachPositions[1] + ", Third: " + reachPositions[2]);
                     Debug.Log("エージェントのリーチ状態が検出されました。キューブを赤色にハイライトします。");
                     foreach (var pos in reachPositions)
                     {
@@ -283,6 +282,7 @@ public class GameController : MonoBehaviour
                     }
                     
                     // timer処理
+                    gridManager.stopFlagDetection = false;
                     StartTimerAsync(DETECTIONTIMER).Forget();
                 }
             }

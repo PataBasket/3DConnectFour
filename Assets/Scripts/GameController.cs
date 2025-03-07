@@ -35,7 +35,7 @@ public class GameController : MonoBehaviour
 
     public enum GameMode
     {
-        Normal,
+        DangerCase0,
         DangerCase1,
         DangerCase2,
     }

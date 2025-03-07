@@ -4,19 +4,23 @@ using UnityEngine.Networking;
 
 public class ApiManager : MonoBehaviour
 {
+    public static ApiManager Instance { get; private set; }
     // GASのデプロイURLを設定（実際のURLに置き換えてください）
     private string _apiUrl = "https://script.google.com/macros/s/AKfycbyNpohmRkLkZmauK5KlfIopnzZ6QIv6YAosCfkwmMlfSv8bv3jJeVADicEvuYzEU-KGbA/exec";
 
-    /// <summary>
-    /// GAS APIのURLを設定します。
-    /// </summary>
-    /// <param name="url">新しいAPIのURL</param>
-    public void SetApiUrl(string url)
+    void Awake()
     {
-        _apiUrl = url;
-        Debug.Log("API URL updated to: " + _apiUrl);
+        if (Instance == null)
+        {
+            Instance = this;
+            // DontDestroyOnLoad(gameObject); // シーンが切り替わらない場合は不要
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
-
+    
     /// <summary>
     /// 引数を使ってGAS APIを呼び出します。
     /// </summary>

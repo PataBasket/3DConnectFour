@@ -80,12 +80,14 @@ public class GridManager : MonoBehaviour
     {
         if (Grid[x, y, z] == DANGER && player != DANGER)
         {
-            Debug.Log("hi");
+            Debug.Log("hiiiiiiiiiiiiiiiiiiiiiiiiii");
             GameObject pole = GameObject.Find("pole_" + x + "_" + z);
             int childCount = pole.transform.childCount;
-            GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
-            Destroy(dangerCube);
-            
+            if (childCount > 0)
+            {
+                GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
+                Destroy(dangerCube);
+            }
             // timer処理
             stopFlagDetection = true;
         }

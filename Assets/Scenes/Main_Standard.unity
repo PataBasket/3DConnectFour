@@ -1219,7 +1219,7 @@ MonoBehaviour:
   cpuAgent: {fileID: 989570783}
   participantIdPanel: {fileID: 1046065465}
   participantIdField: {fileID: 484012794}
-  gameMode: 2
+  gameMode: 0
   redMaterial: {fileID: 2100000, guid: ace4dd0f0c68eed4bab682c4eee9d597, type: 2}
 --- !u!114 &727240141
 MonoBehaviour:

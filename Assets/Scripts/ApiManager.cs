@@ -6,7 +6,7 @@ public class ApiManager : MonoBehaviour
 {
     public static ApiManager Instance { get; private set; }
     // GASのデプロイURLを設定（実際のURLに置き換えてください）
-    private string _apiUrl = "https://script.google.com/macros/s/AKfycbyNpohmRkLkZmauK5KlfIopnzZ6QIv6YAosCfkwmMlfSv8bv3jJeVADicEvuYzEU-KGbA/exec";
+    private string _apiUrl = "https://script.google.com/macros/s/AKfycbwokS0w_5d_cPHXnqAdRdbNwvI3-vl0YuS-kQtY1t8ScGyZhXdqJN2cUyWpIbBE2Tup3Q/exec";
 
     void Awake()
     {
@@ -28,10 +28,10 @@ public class ApiManager : MonoBehaviour
     /// <param name="dangerCase">DangerCase ("0", "1", "2" のいずれか)</param>
     /// <param name="elapsedTime">ゲームの経過時間</param>
     /// <param name="timeType">"start", "danger", "detected", "end" のいずれか</param>
-    public void CallApi(string participantId, string dangerCase, string elapsedTime, string timeType)
+    public void CallApi(string participantId, string dangerCase, string elapsedTime, string timeType, string numberOfCubes)
     {
         // クエリパラメータを付与したURLを作成
-        string urlWithParams = $"{_apiUrl}?participant_id={participantId}&danger_case={dangerCase}&elapsed_time={elapsedTime}&time_type={timeType}";
+        string urlWithParams = $"{_apiUrl}?participant_id={participantId}&danger_case={dangerCase}&elapsed_time={elapsedTime}&time_type={timeType}&number_of_cubes={numberOfCubes}";
         Debug.Log("Calling API: " + urlWithParams);
         StartCoroutine(SendRequest(urlWithParams));
     }

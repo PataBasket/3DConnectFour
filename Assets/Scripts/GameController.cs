@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Unity.MLAgents;
@@ -53,6 +54,7 @@ public class GameController : MonoBehaviour
     // 【変更】DangerCase2用: 赤色マテリアルへの参照をインスペクターから設定
     public Material redMaterial;
 
+    private int _numberOfCubes;
 
     void Awake()
     {
@@ -111,6 +113,12 @@ public class GameController : MonoBehaviour
 
         if (height != -1)
         {
+            if (gameMode == GameMode.DangerCase_0)
+            {
+                var (enemyReachX, enemyReachZ) = winChecker.FindOpponentReach(gridManager.Grid, BLACK);
+                if (enemyReachX == gridIndex.x && enemyReachZ == gridIndex.y) gridManager.stopFlagDetection = true;
+            }
+            
             Vector3 polePosition = clickedPole.transform.position;
             GameObject cube = whiteCube;
             gridManager.PlaceCube(polePosition, gridIndex.x, height, gridIndex.y, currentPlayer, cube);
@@ -133,6 +141,8 @@ public class GameController : MonoBehaviour
                 return;
             }
             
+            _numberOfCubes++;
+            
             // DangerCase2 の場合、ユーザーの配置によって相手のリーチが防がれた際はハイライト解除
             if (gameMode == GameMode.DangerCase_2)
             {
@@ -147,6 +157,7 @@ public class GameController : MonoBehaviour
 
     private async UniTask ProcessAgentMove(CubeAgent agent)
     {
+        _numberOfCubes++;
         // 1秒間の待機
         await UniTask.Delay(1500);
         _uiManager.SE3();
@@ -235,6 +246,28 @@ public class GameController : MonoBehaviour
             }
 
             agent.HasAction = false; // 行動フラグをリセット
+            
+            // ─────────────────────────────────────────────────────────────────────────────
+            // Danger Case 0
+            // ─────────────────────────────────────────────────────────────────────────────
+            var (dangerX_d0, dangerZ_d0) = winChecker.FindOpponentReach(gridManager.Grid, BLACK);
+
+            int danger_x_d0, danger_z_d0;
+        
+            if (dangerX_d0 != -1 && dangerZ_d0 != -1 && gameMode == GameMode.DangerCase_0)
+            {
+                // Block the opponent's reach
+                danger_x_d0 = dangerX_d0;
+                danger_z_d0 = dangerZ_d0;
+                Debug.Log("There is a danger position");
+
+                int dangerHeight_d0 = gridManager.GetAvailableHeight(danger_x_d0, danger_z_d0);
+                if (dangerHeight_d0 != -1)
+                {
+                    // timer処理
+                    StartTimerAsync(DETECTIONTIMER).Forget();
+                }
+            }
             
             // ─────────────────────────────────────────────────────────────────────────────
             // Danger Case 1
@@ -346,17 +379,18 @@ public class GameController : MonoBehaviour
     public async UniTaskVoid StartTimerAsync(int timerNumber)
     {
         float startTime = Time.time;
-        Debug.Log($"timer{timerNumber} started: {startTime}");
+        Debug.Log($"timer{timerNumber} started: {startTime} with {_numberOfCubes}");
 
         // タイマー番号に応じたフラグの変更を待機
         if (timerNumber == OVERALLTIMER)
         {
             Debug.Log(_participantId);
-            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "start");
+            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "start", _numberOfCubes.ToString());
             await UniTask.WaitUntil(() => gridManager.stopFlagOverall, cancellationToken: this.GetCancellationTokenOnDestroy());
         }
         else if (timerNumber == DETECTIONTIMER)
         {
+            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "danger", _numberOfCubes.ToString());
             await UniTask.WaitUntil(() => gridManager.stopFlagDetection, cancellationToken: this.GetCancellationTokenOnDestroy());
         }
 
@@ -365,8 +399,19 @@ public class GameController : MonoBehaviour
         Debug.Log($"timer{timerNumber} lasted: {endTime - startTime}seconds");
 
         // 次回に備えてフラグをリセット
-        if (timerNumber == OVERALLTIMER) gridManager.stopFlagOverall = false;
-        if (timerNumber == DETECTIONTIMER) gridManager.stopFlagDetection = false;
+        if (timerNumber == OVERALLTIMER)
+        {
+            Debug.Log("number of cubes: " + _numberOfCubes);
+            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "end", (_numberOfCubes-1).ToString());
+            gridManager.stopFlagOverall = false;
+        }
+
+        if (timerNumber == DETECTIONTIMER)
+        {
+            Debug.Log("number of cubes: " + _numberOfCubes);
+            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "detected", (_numberOfCubes-1).ToString());
+            gridManager.stopFlagDetection = false;
+        }
     }
     
     // participant ID send button

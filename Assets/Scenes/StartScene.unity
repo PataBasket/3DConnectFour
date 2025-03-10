@@ -1963,6 +1963,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f4d75cae006bea4088fa9b5f51c859a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stopFlagDetection: 0
+  stopFlagOverall: 0
 --- !u!225 &1566379210
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2411,7 +2413,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1821670409
 Transform:
   m_ObjectHideFlags: 0

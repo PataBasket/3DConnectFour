@@ -132,11 +132,16 @@ public class GridManager : MonoBehaviour
         GameObject pole = GameObject.Find("pole_" + x + "_" + z);
         if (pole != null)
         {
-            Transform[] allChildCubes = pole.GetComponentsInChildren<Transform>();
-            GameObject reachCube = allChildCubes[allChildCubes.Length - y - 1].gameObject;
-            return reachCube;
+            // ポールの子オブジェクトのみを取得
+            int childCount = pole.transform.childCount;
+            // 例えば、下から y 番目のキューブを取得する場合：
+            if (childCount > y)
+            {
+                return pole.transform.GetChild(y).gameObject;
+            }
         }
         return null;
     }
+
 
 }

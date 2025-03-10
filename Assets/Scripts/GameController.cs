@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Unity.MLAgents;
 using DG.Tweening;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class GameController : MonoBehaviour
     private InputHandler inputHandler;
     private WinChecker winChecker;
     private UIManager _uiManager;
+    private ApiManager apiManager;
 
     private const int WHITE = 1;
     private const int BLACK = -1;
@@ -28,16 +30,20 @@ public class GameController : MonoBehaviour
 
     private const int OVERALLTIMER = 1;
     private const int DETECTIONTIMER = 2;
-    
-    
+
+    [SerializeField]
+    private GameObject participantIdPanel;
+    private string _participantId;
+    [SerializeField]
+    private InputField participantIdField;
     
     public static GameController Instance { get; private set; }
 
     public enum GameMode
     {
-        Normal,
-        DangerCase1,
-        DangerCase2,
+        DangerCase_0,
+        DangerCase_1,
+        DangerCase_2,
     }
 
     [SerializeField] private GameMode gameMode;
@@ -65,6 +71,7 @@ public class GameController : MonoBehaviour
         gridManager = GridManager.Instance;
         inputHandler = new InputHandler();
         winChecker = new WinChecker();
+        apiManager = ApiManager.Instance;
 
         cpuAgent.playerID = BLACK; // エージェントのプレイヤーIDを設定
 
@@ -79,7 +86,9 @@ public class GameController : MonoBehaviour
         _mainCamera = GameObject.Find("Main Camera");
         _baseObject = GameObject.Find("Base");
         
-        StartTimerAsync(OVERALLTIMER).Forget();
+        // ParticipantID Entry
+        participantIdPanel.SetActive(true);
+        
     }
 
     void Update()
@@ -125,7 +134,7 @@ public class GameController : MonoBehaviour
             }
             
             // DangerCase2 の場合、ユーザーの配置によって相手のリーチが防がれた際はハイライト解除
-            if (gameMode == GameMode.DangerCase2)
+            if (gameMode == GameMode.DangerCase_2)
             {
                 ClearDangerHighlight();
             }
@@ -234,7 +243,7 @@ public class GameController : MonoBehaviour
 
             int danger_x, danger_z;
         
-            if (dangerX != -1 && dangerZ != -1 && gameMode == GameMode.DangerCase1)
+            if (dangerX != -1 && dangerZ != -1 && gameMode == GameMode.DangerCase_1)
             {
                 // Block the opponent's reach
                 danger_x = dangerX;
@@ -257,7 +266,7 @@ public class GameController : MonoBehaviour
             // ─────────────────────────────────────────────────────────────────────────────
             // Danger Case 2
             // ─────────────────────────────────────────────────────────────────────────────
-            if (gameMode == GameMode.DangerCase2)
+            if (gameMode == GameMode.DangerCase_2)
             {
                 var reachPositions = winChecker.FindAgentReachCubePositions(gridManager.Grid, BLACK);
                 // Debug.Log(reachPositions.Count + "見つかりました");
@@ -342,6 +351,8 @@ public class GameController : MonoBehaviour
         // タイマー番号に応じたフラグの変更を待機
         if (timerNumber == OVERALLTIMER)
         {
+            Debug.Log(_participantId);
+            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "start");
             await UniTask.WaitUntil(() => gridManager.stopFlagOverall, cancellationToken: this.GetCancellationTokenOnDestroy());
         }
         else if (timerNumber == DETECTIONTIMER)
@@ -356,5 +367,13 @@ public class GameController : MonoBehaviour
         // 次回に備えてフラグをリセット
         if (timerNumber == OVERALLTIMER) gridManager.stopFlagOverall = false;
         if (timerNumber == DETECTIONTIMER) gridManager.stopFlagDetection = false;
+    }
+    
+    // participant ID send button
+    public void OnClickParticipantId()
+    {
+        _participantId = participantIdField.text;
+        participantIdPanel.SetActive(false);
+        StartTimerAsync(OVERALLTIMER).Forget();
     }
 }

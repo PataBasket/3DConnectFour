@@ -4,6 +4,7 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     private const int EMPTY = 0;
+    private const int DANGER = -2;
     public const int SIZE = 4;
     public const int HEIGHT = 4; // 高さの定義を追加
 
@@ -12,6 +13,10 @@ public class GridManager : MonoBehaviour
     // グリッドの状態を保持する3次元配列
     public int[,,] Grid { get; private set; } = new int[SIZE, HEIGHT, SIZE];
     private Dictionary<GameObject, Vector2Int> poleToGridMap = new Dictionary<GameObject, Vector2Int>();
+    
+    // 計測終了のフラグ
+    public bool stopFlagDetection = false;
+    public bool stopFlagOverall = false;
 
     void Awake()
     {
@@ -62,7 +67,7 @@ public class GridManager : MonoBehaviour
     {
         for (int y = 0; y < HEIGHT; y++)
         {
-            if (Grid[x, y, z] == EMPTY)
+            if (Grid[x, y, z] == DANGER || Grid[x, y, z] == EMPTY)
             {
                 return y;
             }
@@ -73,7 +78,22 @@ public class GridManager : MonoBehaviour
     // キューブを配置
     public void PlaceCube(Vector3 polePosition, int x, int y, int z, int player, GameObject cubePrefab)
     {
+        if (Grid[x, y, z] == DANGER && player != DANGER)
+        {
+            Debug.Log("hiiiiiiiiiiiiiiiiiiiiiiiiii");
+            GameObject pole = GameObject.Find("pole_" + x + "_" + z);
+            int childCount = pole.transform.childCount;
+            if (childCount > 0)
+            {
+                GameObject dangerCube = pole.transform.GetChild(childCount - 1).gameObject;
+                Destroy(dangerCube);
+            }
+            // timer処理
+            stopFlagDetection = true;
+        }
         Grid[x, y, z] = player;
+        // Debug.Log("x: " + x + ", y: " + y + ", z: " + z);
+        // Debug.Log(Grid[x,y,z]);
         GameObject cube = Instantiate(cubePrefab);
         cube.transform.position = new Vector3(polePosition.x, y, polePosition.z);
         cube.transform.SetParent(GameObject.Find("pole_" + x + "_" + z).transform);
@@ -107,4 +127,23 @@ public class GridManager : MonoBehaviour
         }
         return true;
     }
+    
+    // 【変更・追加箇所】 GridManager.cs に新たなメソッド GetCubeAt を追加
+    public GameObject GetCubeAt(int x, int y, int z)
+    {
+        GameObject pole = GameObject.Find("pole_" + x + "_" + z);
+        if (pole != null)
+        {
+            // ポールの子オブジェクトのみを取得
+            int childCount = pole.transform.childCount;
+            // 例えば、下から y 番目のキューブを取得する場合：
+            if (childCount > y)
+            {
+                return pole.transform.GetChild(y).gameObject;
+            }
+        }
+        return null;
+    }
+
+
 }

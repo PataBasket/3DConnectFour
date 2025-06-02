@@ -87,9 +87,9 @@ public class GameController : MonoBehaviour
 
         _mainCamera = GameObject.Find("Main Camera");
         _baseObject = GameObject.Find("Base");
-        
-        // ParticipantID Entry
-        participantIdPanel.SetActive(true);
+        //
+        // // ParticipantID Entry
+        // participantIdPanel.SetActive(true);
         
     }
 
@@ -385,12 +385,12 @@ public class GameController : MonoBehaviour
         if (timerNumber == OVERALLTIMER)
         {
             Debug.Log(_participantId);
-            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "start", _numberOfCubes.ToString());
+            // apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "start", _numberOfCubes.ToString());
             await UniTask.WaitUntil(() => gridManager.stopFlagOverall, cancellationToken: this.GetCancellationTokenOnDestroy());
         }
         else if (timerNumber == DETECTIONTIMER)
         {
-            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "danger", _numberOfCubes.ToString());
+            // apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "danger", _numberOfCubes.ToString());
             await UniTask.WaitUntil(() => gridManager.stopFlagDetection, cancellationToken: this.GetCancellationTokenOnDestroy());
         }
 
@@ -402,14 +402,14 @@ public class GameController : MonoBehaviour
         if (timerNumber == OVERALLTIMER)
         {
             Debug.Log("number of cubes: " + _numberOfCubes);
-            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "end", (_numberOfCubes-1).ToString());
+            // apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "end", (_numberOfCubes-1).ToString());
             gridManager.stopFlagOverall = false;
         }
 
         if (timerNumber == DETECTIONTIMER)
         {
             Debug.Log("number of cubes: " + _numberOfCubes);
-            apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "detected", (_numberOfCubes-1).ToString());
+            // apiManager.CallApi(_participantId, gameMode.ToString().Substring(gameMode.ToString().IndexOf('_') + 1), Time.time.ToString(), "detected", (_numberOfCubes-1).ToString());
             gridManager.stopFlagDetection = false;
         }
     }
